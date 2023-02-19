@@ -9,22 +9,37 @@ mp_drawing = mp.solutions.drawing_utils
 
 def make_dir():
     DATA_PATH = os.path.join('MP_Data')
-    actions = np.array(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 
-                        'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 
-                        'hello', 'bye', 'yes', 'no', 'good morning', 'good night', 'please', 'help', 'sorry', 
-                        'thank you', 'excuse me', 'okay', 'stop', 'who', 'what', 'why', 'which', 'water', 'happy', 
-                        'sad', 'angry', 'afraid', 'hungry', 'good luck', 'name'])
+    actions_numbers = np.array(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
+    actions_letters = np.array(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+                                'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'])
+    actions_words = np.array(['hello', 'bye', 'yes', 'no', 'good morning', 'please', 'help', 'sorry',
+                            'thank you', 'okay'])
 
-    no_sequences = 30
-    sequence_length = 30 #frame_length
+    no_sequences = 10
+    sequence_length = 30  # frame_length
 
-    for action in actions:
+    for action in actions_numbers:
         for sequence in range(no_sequences):
             try:
                 os.makedirs(os.path.join(DATA_PATH, action, str(sequence)))
             except:
                 pass
+    
+    for action in actions_letters:
+        for sequence in range(no_sequences):
+            try:
+                os.makedirs(os.path.join(DATA_PATH, action, str(sequence)))
+            except:
+                pass
+
+    for action in actions_words:
+        for sequence in range(no_sequences):
+            try:
+                os.makedirs(os.path.join(DATA_PATH, action, str(sequence)))
+            except:
+                pass
+
+
 
 
 cap = cv2.VideoCapture(0)
