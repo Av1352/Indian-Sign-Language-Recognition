@@ -1,9 +1,11 @@
 import cv2
 import numpy as np
 import os
-from matplotlib import pyplot as plt
 import time
 import mediapipe as mp
+
+mp_holistic = mp.solutions.holistic
+mp_drawing = mp.solutions.drawing_utils
 
 def make_dir():
     DATA_PATH = os.path.join('MP_Data')
