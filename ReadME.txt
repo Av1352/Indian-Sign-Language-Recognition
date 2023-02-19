@@ -1,1 +1,1 @@
-Sign Language COnverter
+Sign Language Converter
