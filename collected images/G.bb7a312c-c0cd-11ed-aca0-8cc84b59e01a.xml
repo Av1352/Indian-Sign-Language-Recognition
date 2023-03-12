@@ -1,0 +1,26 @@
+<annotation>
+	<folder>collected images</folder>
+	<filename>G.bb7a312c-c0cd-11ed-aca0-8cc84b59e01a.jpg</filename>
+	<path>C:\Users\anjuv\Documents\GitHub\Sign-language-converter\collected images\G.bb7a312c-c0cd-11ed-aca0-8cc84b59e01a.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>640</width>
+		<height>480</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>G</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>369</xmin>
+			<ymin>282</ymin>
+			<xmax>492</xmax>
+			<ymax>451</ymax>
+		</bndbox>
+	</object>
+</annotation>

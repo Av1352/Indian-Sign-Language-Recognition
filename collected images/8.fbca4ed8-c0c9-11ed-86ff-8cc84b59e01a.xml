@@ -1,0 +1,26 @@
+<annotation>
+	<folder>collected images</folder>
+	<filename>8.fbca4ed8-c0c9-11ed-86ff-8cc84b59e01a.jpg</filename>
+	<path>C:\Users\anjuv\Documents\GitHub\Sign-language-converter\collected images\8.fbca4ed8-c0c9-11ed-86ff-8cc84b59e01a.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>640</width>
+		<height>480</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>8</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>202</xmin>
+			<ymin>313</ymin>
+			<xmax>299</xmax>
+			<ymax>453</ymax>
+		</bndbox>
+	</object>
+</annotation>
