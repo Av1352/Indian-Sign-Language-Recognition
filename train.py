@@ -6,8 +6,8 @@ from keras.layers import MaxPooling2D
 from tensorflow.keras.optimizers import Adam
 from keras.preprocessing.image import ImageDataGenerator
 
-train_dir = 'data/train'
-val_dir = 'data/test'
+train_dir = 'output/train'
+val_dir = 'output/test'
 train_datagen = ImageDataGenerator(rescale=1./255)
 val_datagen = ImageDataGenerator(rescale=1./255)
 

@@ -6,8 +6,8 @@ from keras.layers import MaxPooling2D
 from keras.layers import Dense, Dropout, Flatten
 
 
-train_dir = 'data/train'
-val_dir = 'data/test'
+train_dir = 'output/train'
+val_dir = 'output/test'
 train_datagen = ImageDataGenerator(rescale=1./255)
 val_datagen = ImageDataGenerator(rescale=1./255)
 
