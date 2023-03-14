@@ -51,16 +51,16 @@ model.add(Dropout(0.25))
 model.add(Flatten())
 model.add(Dense(512, activation='relu'))
 model.add(Dropout(0.5))
-model.add(Dense(35, activation='softmax'))
+model.add(Dense(41, activation='softmax'))
 
-batch_size = 256
+batch_size = 100
 epochs = 100
 model.compile(optimizer='adam', loss='categorical_crossentropy',
               metrics=['accuracy'])
 
 model.summary()
 
-history = model.fit(train_generator, steps_per_epoch=28709 // 64,
+history = model.fit(train_generator, steps_per_epoch=33600 // 64,
                     epochs=75,
                     validation_data=val_generator,
                     validation_steps=7178 // 64)
