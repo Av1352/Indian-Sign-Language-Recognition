@@ -4,6 +4,7 @@ from keras.models import Sequential
 from keras.layers import Conv2D
 from keras.layers import MaxPooling2D
 from keras.layers import Dense, Dropout, Flatten
+import matplotlib as plt
 
 
 train_dir = 'output/train'
