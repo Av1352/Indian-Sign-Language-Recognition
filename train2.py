@@ -9,21 +9,24 @@ import matplotlib as plt
 
 train_dir = 'output/train'
 val_dir = 'output/test'
-train_datagen = ImageDataGenerator(rescale=1./255)
-val_datagen = ImageDataGenerator(rescale=1./255)
+train_datagen = ImageDataGenerator(rescale=1./255,
+                                   shear_range=0.2,
+                                   zoom_range=0.2,
+                                   horizontal_flip=True)
+test_datagen = ImageDataGenerator(rescale=1./255)
 
 train_generator = train_datagen.flow_from_directory(
     train_dir,
-    target_size=(48, 48),
-    batch_size=64,
+    target_size=(128, 128),
+    batch_size=24,
     color_mode="grayscale",
-    class_mode='categorical'
+    class_mode='categorical',
 )
 
-val_generator = val_datagen.flow_from_directory(
+test_generator = test_datagen.flow_from_directory(
     val_dir,
     target_size=(48, 48),
-    batch_size=64,
+    batch_size=6,
     color_mode="grayscale",
     class_mode='categorical'
 )
@@ -32,18 +35,18 @@ val_generator = val_datagen.flow_from_directory(
 
 model = Sequential()
 # The first two layers with 32 filters of window size 3x3
-model.add(Conv2D(32, (3, 3), padding='same',
+model.add(Conv2D(32, (3, 3),
           activation='relu', input_shape=(48, 48, 1)))
 model.add(Conv2D(32, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.25))
 
-model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), activation='relu'))
 model.add(Conv2D(64, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.25))
 
-model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), activation='relu'))
 model.add(Conv2D(64, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.25))
@@ -60,10 +63,9 @@ model.compile(optimizer='adam', loss='categorical_crossentropy',
 
 model.summary()
 
-history = model.fit(train_generator, steps_per_epoch=33600 // 64,
+history = model.fit(train_generator,
                     epochs=75,
-                    validation_data=val_generator,
-                    validation_steps=7178 // 64)
+                    validation_data=val_generator)
 model.evaluate(X_test, y_test, verbose=0)
 
 # Visualizing loss
