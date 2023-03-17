@@ -1,0 +1,26 @@
+<annotation>
+	<folder>collected images</folder>
+	<filename>Z.f3539a6d-c0d1-11ed-8d1b-683e2670f3d6.jpg</filename>
+	<path>C:\Users\uthik\OneDrive\Documents\GitHub\Sign-language-converter\collected images\Z.f3539a6d-c0d1-11ed-8d1b-683e2670f3d6.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>640</width>
+		<height>480</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>Z</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>168</xmin>
+			<ymin>247</ymin>
+			<xmax>399</xmax>
+			<ymax>426</ymax>
+		</bndbox>
+	</object>
+</annotation>

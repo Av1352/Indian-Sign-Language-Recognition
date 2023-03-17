@@ -1,0 +1,26 @@
+<annotation>
+	<folder>collected images</folder>
+	<filename>yes.f22b9f5f-c0df-11ed-8b6c-8cc84b59e01a.jpg</filename>
+	<path>C:\Users\uthik\OneDrive\Documents\GitHub\Sign-language-converter\collected images\yes.f22b9f5f-c0df-11ed-8b6c-8cc84b59e01a.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>640</width>
+		<height>480</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>YES</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>93</xmin>
+			<ymin>327</ymin>
+			<xmax>257</xmax>
+			<ymax>478</ymax>
+		</bndbox>
+	</object>
+</annotation>

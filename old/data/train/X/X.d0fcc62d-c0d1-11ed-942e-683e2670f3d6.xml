@@ -1,0 +1,26 @@
+<annotation>
+	<folder>collected images</folder>
+	<filename>X.d0fcc62d-c0d1-11ed-942e-683e2670f3d6.jpg</filename>
+	<path>C:\Users\uthik\OneDrive\Documents\GitHub\Sign-language-converter\collected images\X.d0fcc62d-c0d1-11ed-942e-683e2670f3d6.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>640</width>
+		<height>480</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>X</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>106</xmin>
+			<ymin>323</ymin>
+			<xmax>199</xmax>
+			<ymax>391</ymax>
+		</bndbox>
+	</object>
+</annotation>

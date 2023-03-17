@@ -1,0 +1,26 @@
+<annotation>
+	<folder>collected images</folder>
+	<filename>sorry.7c441632-c0f5-11ed-ac7b-8cc84b59e01a.jpg</filename>
+	<path>C:\Users\anjuv\Documents\GitHub\Sign-language-converter\collected images\sorry.7c441632-c0f5-11ed-ac7b-8cc84b59e01a.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>640</width>
+		<height>480</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>SORRY</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>323</xmin>
+			<ymin>322</ymin>
+			<xmax>386</xmax>
+			<ymax>411</ymax>
+		</bndbox>
+	</object>
+</annotation>
