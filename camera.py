@@ -24,7 +24,7 @@ def camera():
     model.add(Conv2D(32, (3, 3), padding="same",activation='relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Flatten())
-    model.add(Dense(128, activation='relu'))
+    model.add(Dense(48, activation='relu'))
     model.add(Dropout(0.40))
     model.add(Dense(96, activation='relu'))
     model.add(Dropout(0.40))
@@ -46,7 +46,7 @@ def camera():
     mphands = mp.solutions.hands
     hands = mphands.Hands()
     handCascade = mp.solutions.drawing_utils
-    image = cv2.imread("user.png")
+    image = cv2.imread("user.jpg")
     h, w, c = image.shape
     framergb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     result = hands.process(framergb)
