@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 from PIL import Image
-from keras.models import Sequential
+from keras.models import Sequential, model_from_json
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D
 from keras.optimizers import Adam
@@ -19,12 +19,12 @@ show_text = [0]
 
 def camera():
     model = Sequential()
-    model.add(Conv2D(32, (3, 3),activation='relu', input_shape=(48, 48, 1)))
+    model.add(Conv2D(32, (3, 3),activation='relu', input_shape=(128, 128, 1)))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Conv2D(32, (3, 3), padding="same",activation='relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Flatten())
-    model.add(Dense(48, activation='relu'))
+    model.add(Dense(128, activation='relu'))
     model.add(Dropout(0.40))
     model.add(Dense(96, activation='relu'))
     model.add(Dropout(0.40))
@@ -32,8 +32,21 @@ def camera():
     model.add(Dense(64, activation='relu'))
     model.add(Dense(41, activation='softmax'))
 
+    json_file = open('model_new.json', 'r')
+    loaded_model_json = json_file.read()
+    json_file.close()
+    loaded_model = model_from_json(loaded_model_json)
+    # load weights into new model
+    loaded_model.load_weights("model.h5")
+    print("Loaded model from disk")
 
-    model.load_weights('model.h5')
+    loaded_model.compile(optimizer='adam',
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+
+
+    # score = loaded_model.evaluate(X, Y, verbose=0)
+    # print("%s: %.2f%%" % (loaded_model.metrics_names[1], score[1]*100))
     cv2.ocl.setUseOpenCL(False)
 	
     dict = {1 : '1', 2: '2', 3 : '3', 4 : '4', 5 : '5', 6: '6', 7 : '7', 8 : '8', 9 : '9',
@@ -46,7 +59,7 @@ def camera():
     mphands = mp.solutions.hands
     hands = mphands.Hands()
     handCascade = mp.solutions.drawing_utils
-    image = cv2.imread("user.jpg")
+    image = cv2.imread("user.png")
     h, w, c = image.shape
     framergb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     result = hands.process(framergb)
