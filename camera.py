@@ -4,13 +4,8 @@ from PIL import Image
 from keras.models import Sequential
 from keras.models import load_model
 
-from pandastable import Table, TableModel
 from tensorflow.keras.preprocessing import image
 
-
-import datetime
-from threading import Thread
-import mediapipe
 import time
 import pandas as pd
 import mediapipe as mp
