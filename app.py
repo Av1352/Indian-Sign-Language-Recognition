@@ -5,7 +5,7 @@ import sys
 import time
 import operator
 
-# import hand_capture as face
+import hand_capture as face
 import camera as camera
 
 # from string import ascii_uppercase
@@ -32,7 +32,7 @@ import camera as camera
 # loaded_model = model_from_json(model_json)
 # loaded_model.load_weights("Models\model_new.h5")
 
-# face.capture()
+face.capture()
 img = cv2.imread("user.png")
 
 prediction = camera.camera()

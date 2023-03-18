@@ -2,9 +2,13 @@ import numpy as np
 import cv2
 from PIL import Image
 from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten
+from keras. layers import Conv2D
+from keras.optimizers import Adam
+from keras.layers import MaxPooling2D
 from keras.models import load_model
-
-from tensorflow.keras.preprocessing import image
+from keras.preprocessing.image import ImageDataGenerator
+from keras.preprocessing import image
 
 import time
 import pandas as pd
@@ -14,7 +18,22 @@ show_text = [0]
 
 
 def camera():
-    model = load_model('Models/model_new.h5')
+    model = Sequential()
+    model.add(Conv2D(32, (3, 3),activation='relu', input_shape=(48, 48, 1)))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Conv2D(32, (3, 3), padding="same",activation='relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Flatten())
+    model.add(Dense(128, activation='relu'))
+    model.add(Dropout(0.40))
+    model.add(Dense(96, activation='relu'))
+    model.add(Dropout(0.40))
+
+    model.add(Dense(64, activation='relu'))
+    model.add(Dense(41, activation='softmax'))
+
+
+    model.load_model('model.h5')
     cv2.ocl.setUseOpenCL(False)
 	
     dict = {1 : '1', 2: '2', 3 : '3', 4 : '4', 5 : '5', 6: '6', 7 : '7', 8 : '8', 9 : '9',
@@ -68,13 +87,13 @@ def camera():
         print(hand)
         return hand
 
-def music_rec():
-	# print('---------------- Value ------------', music_dist[show_text[0]])
+# def music_rec():
+# 	# print('---------------- Value ------------', music_dist[show_text[0]])
 
-	df = pd.read_csv(music_dist[show_text[0]])
-	df = df[['', 'Album', 'Artist']]
-	df = df.head(15)
-	return df
+# 	df = pd.read_csv(music_dist[show_text[0]])
+# 	df = df[['', 'Album', 'Artist']]
+# 	df = df.head(15)
+# 	return df
 
 
 if __name__ == '__main__':
