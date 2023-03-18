@@ -3,10 +3,10 @@ import cv2
 from PIL import Image
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
-from keras. layers import Conv2D
+from keras.layers import Conv2D
 from keras.optimizers import Adam
 from keras.layers import MaxPooling2D
-from keras.models import load_model
+
 from keras.preprocessing.image import ImageDataGenerator
 from keras.preprocessing import image
 
@@ -33,7 +33,7 @@ def camera():
     model.add(Dense(41, activation='softmax'))
 
 
-    model.load_model('model.h5')
+    model.load_weights('model.h5')
     cv2.ocl.setUseOpenCL(False)
 	
     dict = {1 : '1', 2: '2', 3 : '3', 4 : '4', 5 : '5', 6: '6', 7 : '7', 8 : '8', 9 : '9',
