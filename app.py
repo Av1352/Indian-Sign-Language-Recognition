@@ -8,17 +8,6 @@ import operator
 import hand_capture as face
 import camera as camera
 
-# from string import ascii_uppercase
-
-# import tkinter as tk
-# from PIL import Image, ImageTk
-
-# from hunspell import Hunspell
-# import enchant
-# from keras.models import model_from_json
-
-# os.environ["THEANO_FLAGS"] = "device=cuda, assert_no_cpu_op=True"
-
 # #Application :
 
 # hs = Hunspell('en_US')
