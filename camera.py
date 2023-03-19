@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from PIL import Image
+
 from keras.models import Sequential, model_from_json
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D
@@ -15,11 +15,14 @@ import pandas as pd
 import mediapipe as mp
 
 show_text = [0]
-
+image = cv2.imread("user.png")
+h, w,c = image.shape
 
 def camera():
+
+
     model = Sequential()
-    model.add(Conv2D(32, (3, 3),activation='relu', input_shape=(128, 128, 1)))
+    model.add(Conv2D(32, (3, 3),activation='relu', input_shape=(h, w, 1)))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Conv2D(32, (3, 3), padding="same",activation='relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -37,7 +40,7 @@ def camera():
     json_file.close()
     loaded_model = model_from_json(loaded_model_json)
     # load weights into new model
-    model.load_weights("model.h5")
+    model.load("model.h5")
     print("Loaded model from disk")
 
     loaded_model.compile(optimizer='adam',
@@ -57,8 +60,7 @@ def camera():
     mphands = mp.solutions.hands
     hands = mphands.Hands()
     handCascade = mp.solutions.drawing_utils
-    image = cv2.imread("user.png")
-    h, w, c = image.shape
+    
     framergb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     result = hands.process(framergb)
     
