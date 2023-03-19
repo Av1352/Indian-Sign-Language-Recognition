@@ -37,7 +37,7 @@ def camera():
     json_file.close()
     loaded_model = model_from_json(loaded_model_json)
     # load weights into new model
-    loaded_model.load_weights("model.h5")
+    model.load_weights("model.h5")
     print("Loaded model from disk")
 
     loaded_model.compile(optimizer='adam',
@@ -45,8 +45,6 @@ def camera():
               metrics=['accuracy'])
 
 
-    # score = loaded_model.evaluate(X, Y, verbose=0)
-    # print("%s: %.2f%%" % (loaded_model.metrics_names[1], score[1]*100))
     cv2.ocl.setUseOpenCL(False)
 	
     dict = {1 : '1', 2: '2', 3 : '3', 4 : '4', 5 : '5', 6: '6', 7 : '7', 8 : '8', 9 : '9',
