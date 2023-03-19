@@ -18,9 +18,8 @@ show_text = [0]
 
 
 def camera():
-    PATCHSIZE = 48
     model = Sequential()
-    model.add(Conv2D(32, (3, 3),activation='relu', input_shape=(PATCHSIZE, PATCHSIZE, 1)))
+    model.add(Conv2D(32, (3, 3),activation='relu', input_shape=(128, 128, 1)))
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Conv2D(32, (3, 3), padding="same",activation='relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
