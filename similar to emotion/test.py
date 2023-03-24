@@ -157,14 +157,14 @@ def model_predict():
     
     prediction = model.predict(image)
     print(prediction)
-    # global maxindex
-    # maxindex = int(np.argmax(prediction))
-    # show_text[0] = maxindex
+    global maxindex
+    maxindex = int(np.argmax(prediction))
+    show_text[0] = maxindex
 
-    # print("dict: ",dict[maxindex])
-    # global hand
-    # hand = dict[maxindex]
-    # print("Hand", hand)
+    print("dict: ",dict[maxindex])
+    global hand
+    hand = dict[maxindex]
+    print("Hand", hand)
     
 
 def main():
