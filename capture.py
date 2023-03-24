@@ -5,22 +5,13 @@ from time import sleep
 import mediapipe as mp
 
 import numpy as np
-import pandas as pd
-
-
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten
-from keras.layers import Conv2D
-from keras.optimizers import Adam
-from keras.layers import MaxPooling2D
-from keras.preprocessing import image
-
 
 mphands = mp.solutions.hands
 hands = mphands.Hands()
 handCascade = mp.solutions.drawing_utils
 
 video_capture = cv2.VideoCapture(0)
+
 
 def capture():
     while True:
@@ -55,14 +46,14 @@ def capture():
                     if y < y_min:
                         y_min = y
                 cv2.rectangle(frame, (x_min, y_min),
-                            (x_max, y_max), (0, 255, 0), 2)
-                handCascade.draw_landmarks(frame, handLMs, mphands.HAND_CONNECTIONS)
+                              (x_max, y_max), (0, 255, 0), 2)
+                handCascade.draw_landmarks(
+                    frame, handLMs, mphands.HAND_CONNECTIONS)
                 roi_rgb_frame = framergb[y:y + h, x:x + w]
                 cropped_img = np.expand_dims(np.expand_dims(
                     cv2.resize(roi_rgb_frame, (48, 48)), -1), 0)
-                
+
                 return cropped_img
-                
 
     # Display the resulting frame
         cv2.imshow('Video', frame)
@@ -91,6 +82,7 @@ def capture():
     # When everything is done, release the capture
     video_capture.release()
     cv2.destroyAllWindows()
+
 
 if __name__ == '__main__':
     capture()

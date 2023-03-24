@@ -5,14 +5,13 @@ import sys
 import time
 import operator
 
-import hand_capture as face
-import camera as camera
+import capture as hand
+import predict as predict
 
-
-face.capture()
+hand.capture()
 img = cv2.imread("user.png")
 
-prediction = camera.camera()
+prediction = predict.predict()
 print(prediction)
 
 global sign
