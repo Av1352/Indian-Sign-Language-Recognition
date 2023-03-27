@@ -56,14 +56,14 @@ def predict():
     model.load_weights('Models/model.h5')
     print("Loaded model from disk")
 
-    model.compile(optimizer='adam',
-              loss='categorical_crossentropy',
-              metrics=['accuracy'])
+    # model.compile(optimizer='adam',
+    #           loss='categorical_crossentropy',
+    #           metrics=['accuracy'])
 
 
     cv2.ocl.setUseOpenCL(False)
     prediction = model.predict(image)
-    print(prediction)
+    # print(prediction)
 
     global maxindex
     maxindex = int(np.argmax(prediction))

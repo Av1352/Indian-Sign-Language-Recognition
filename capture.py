@@ -49,9 +49,7 @@ def capture():
                               (x_max, y_max), (0, 255, 0), 2)
                 handCascade.draw_landmarks(
                     frame, handLMs, mphands.HAND_CONNECTIONS)
-                roi_rgb_frame = framergb[y:y + h, x:x + w]
-                cropped_img = np.expand_dims(np.expand_dims(
-                    cv2.resize(roi_rgb_frame, (100, 100)), -1), 0)
+
 
     # Display the resulting frame
         cv2.imshow('Video', frame)
@@ -81,7 +79,6 @@ def capture():
     video_capture.release()
     cv2.destroyAllWindows()
 
-    return cropped_img
 
 
 if __name__ == '__main__':

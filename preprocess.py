@@ -40,17 +40,17 @@ def roi_hand():
 
 # Preprocessing all the images to extract ROI i.e. hands
 def preprocess_images():
-    image = 'roi.png'
+    image = 'user.png'
     #reading image
     img=imageio.imread(image)
     #Converting image to grayscale
     gray_img=cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
     #Converting image to HSV format
     hsv_img = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
-    cv2.imshow("hsv",hsv_img)
+    # cv2.imshow("hsv",hsv_img)
     #Defining boundary level for skin color in HSV
     skin_color_lower= np.array([0,40,30],np.uint8)
-    skin_color_upper= np.array([96,255,255],np.uint8)
+    skin_color_upper= np.array([43,255,255],np.uint8)
     #Producing mask
     skin_mask=cv2.inRange(hsv_img,skin_color_lower,skin_color_upper)
     #Removing Noise from mask
