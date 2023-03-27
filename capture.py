@@ -29,6 +29,7 @@ def capture():
         hand_landmarks = result.multi_hand_landmarks
 
         # Draw a rectangle around the hands
+
         if hand_landmarks:
             for handLMs in hand_landmarks:
                 x_max = 0
@@ -52,6 +53,7 @@ def capture():
 
 
     # Display the resulting frame
+    
         cv2.imshow('Video', frame)
 
         if cv2.waitKey(1) & 0xFF == ord('s'):
