@@ -12,7 +12,6 @@ handCascade = mp.solutions.drawing_utils
 
 def roi_hand():
     image = 'user.png'
-    # imagergb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     img = imageio.imread(image)
     result = hands.process(img)
     hand_landmarks = result.multi_hand_landmarks
@@ -47,7 +46,6 @@ def preprocess_images():
     gray_img=cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
     #Converting image to HSV format
     hsv_img = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
-    # cv2.imshow("hsv",hsv_img)
     #Defining boundary level for skin color in HSV
     skin_color_lower= np.array([0,40,30],np.uint8)
     skin_color_upper= np.array([43,255,255],np.uint8)
