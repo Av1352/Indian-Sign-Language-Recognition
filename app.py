@@ -6,14 +6,28 @@ import time
 import operator
 
 import capture as hand
-import predict as predict
+import preprocess as preprocess
+from predict import predict
 
-hand.capture()
-img = cv2.imread("user.png")
+def capture_image():
+    hand.capture()
+    # img = cv2.imread("user.png")
 
-prediction = predict.predict()
-print(prediction)
+def preprocess_image():
+    preprocess.preprocess_images()
 
-global sign
-sign = prediction
-print(sign)
+def predict_sign():
+    prediction = predict()
+    print(prediction)
+
+    global sign
+    sign = prediction
+    print(sign)
+
+def main():
+    capture_image()
+    preprocess_image()
+    predict_sign()
+
+if __name__ == '__main__':
+    main()

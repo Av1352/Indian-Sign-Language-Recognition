@@ -22,7 +22,7 @@ dict = {0: '0', 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 
 
 IMG_SIZE = 100
 
-image = cv2.imread('user.jpg')
+image = cv2.imread('processed.png')
 image = cv2.resize(image, (IMG_SIZE, IMG_SIZE))
 image = np.array(image).reshape(-1, IMG_SIZE, IMG_SIZE, 1)
 # h, w, c = image.shape
@@ -63,7 +63,7 @@ def predict():
 
     cv2.ocl.setUseOpenCL(False)
     prediction = model.predict(image)
-    # print(prediction)
+    print(prediction)
 
     global maxindex
     maxindex = int(np.argmax(prediction))

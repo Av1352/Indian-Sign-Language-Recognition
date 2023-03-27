@@ -28,7 +28,7 @@ def capture():
         result = hands.process(framergb)
         hand_landmarks = result.multi_hand_landmarks
 
-        # Draw a rectangle around the faces
+        # Draw a rectangle around the hands
         if hand_landmarks:
             for handLMs in hand_landmarks:
                 x_max = 0
@@ -51,9 +51,7 @@ def capture():
                     frame, handLMs, mphands.HAND_CONNECTIONS)
                 roi_rgb_frame = framergb[y:y + h, x:x + w]
                 cropped_img = np.expand_dims(np.expand_dims(
-                    cv2.resize(roi_rgb_frame, (48, 48)), -1), 0)
-
-                return cropped_img
+                    cv2.resize(roi_rgb_frame, (100, 100)), -1), 0)
 
     # Display the resulting frame
         cv2.imshow('Video', frame)
@@ -76,12 +74,14 @@ def capture():
             cv2.destroyAllWindows()
             break
 
-        # Display the resulting frame
+        # Display the resulting frames
         cv2.imshow('Video', frame)
 
     # When everything is done, release the capture
     video_capture.release()
     cv2.destroyAllWindows()
+
+    return cropped_img
 
 
 if __name__ == '__main__':
