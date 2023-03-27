@@ -24,9 +24,6 @@ def predict_sign():
     prediction = predict()
     print(prediction)
 
-    global sign
-    sign = prediction
-    print(sign)
 
 
 def main():

@@ -46,7 +46,7 @@ def capture():
                     if y < y_min:
                         y_min = y
                 cv2.rectangle(frame, (x_min, y_min),
-                              (x_max, y_max), (255, 255, 255), 2)
+                              (x_max, y_max), (0, 255, 0), 2)
                 handCascade.draw_landmarks(
                     frame, handLMs, mphands.HAND_CONNECTIONS)
                 roi_rgb_frame = framergb[y:y + h, x:x + w]
