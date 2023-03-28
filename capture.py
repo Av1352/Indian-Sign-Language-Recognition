@@ -3,7 +3,6 @@ import sys
 import datetime as dt
 from time import sleep
 import mediapipe as mp
-
 import numpy as np
 
 mphands = mp.solutions.hands
@@ -29,7 +28,6 @@ def capture():
         hand_landmarks = result.multi_hand_landmarks
 
         # Draw a rectangle around the hands
-
         if hand_landmarks:
             for handLMs in hand_landmarks:
                 x_max = 0
@@ -52,8 +50,7 @@ def capture():
                     frame, handLMs, mphands.HAND_CONNECTIONS)
 
 
-    # Display the resulting frame
-    
+    # Display the resulting frame    
         cv2.imshow('Video', frame)
 
         if cv2.waitKey(1) & 0xFF == ord('s'):
@@ -80,8 +77,6 @@ def capture():
     # When everything is done, release the capture
     video_capture.release()
     cv2.destroyAllWindows()
-
-
 
 if __name__ == '__main__':
     capture()

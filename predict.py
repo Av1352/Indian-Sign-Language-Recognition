@@ -1,6 +1,5 @@
 import numpy as np
 import cv2
-
 from keras.models import Sequential, model_from_json
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D
@@ -57,11 +56,6 @@ def predict():
     model.load_weights('Models/model.h5')
     print("Loaded model from disk")
 
-    # model.compile(optimizer='adam',
-    #           loss='categorical_crossentropy',
-    #           metrics=['accuracy'])
-
-
     cv2.ocl.setUseOpenCL(False)
     prediction = model.predict(image)
     # print(prediction)
@@ -76,15 +70,6 @@ def predict():
     print("Hand", hand)
 
     return hand
-
-
-# def music_rec():
-# 	# print('---------------- Value ------------', music_dist[show_text[0]])
-
-# 	df = pd.read_csv(music_dist[show_text[0]])
-# 	df = df[['', 'Album', 'Artist']]
-# 	df = df.head(15)
-# 	return df
 
 
 if __name__ == '__main__':
