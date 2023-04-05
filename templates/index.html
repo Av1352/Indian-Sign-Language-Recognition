@@ -22,8 +22,10 @@
     <link rel="stylesheet" href="static/css/Bootstrap-Image-Uploader.css" />
     <link rel="stylesheet" href="static/css/Features-Large-Icons-icons.css" />
     <link rel="stylesheet" href="static/css/Footer-Basic.css" />
-    <link rel="stylesheet" href="static/css/style.css"
     <link
+      rel="stylesheet"
+      href="static/css/style.css"
+      <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css"
     />
@@ -35,7 +37,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.10.0/baguetteBox.min.css"
     />
-    <link rel="icon" href="static/img/Logo.png" type="image/icon type">
+    <link rel="icon" href="static/img/Logo.png" type="image/icon type" />
   </head>
 
   <body
@@ -77,7 +79,8 @@
     <header
       class="text-center text-white d-flex masthead"
       data-bss-hover-animate="pulse"
-     style="background: url('static/img/download.png');
+      style="
+        background: url('static/img/download.png');
         background-size: cover, auto, auto;
       "
     >
@@ -85,10 +88,7 @@
         <div class="row">
           <div class="col-lg-10 col-xl-12 offset-xl-0 mx-auto">
             <h1 class="text-uppercase">
-              <strong
-                >Music recommendation system based on emotion
-                recognition</strong
-              >
+              <strong>Indian Sign Language Recognition System</strong>
             </h1>
             <hr />
           </div>
@@ -98,7 +98,7 @@
             class="text-faded mb-5"
             style="margin: 0px 0px; margin-bottom: 24px"
           >
-            We can help you find a playlist of songs that best suit your mood.
+            We can help you communicate with the world.
           </p>
           <a class="btn btn-primary btn-xl" role="button" href="#services"
             >Find Out More</a
@@ -126,13 +126,12 @@
                 padding-right: 4px;
                 padding-left: 4px;
                 padding-bottom: 4px;
-
               "
               class="text-white"
             >
-              Once you take a picture of yourself, we will analyze your mood and
-              generate a customized playlist that would best suit your
-              situation!<br />
+              Once you take a picture of the gesture, we will analyze the sign
+              you are performing and predict the sign you are trying to
+              perform.<br />
             </p>
           </div>
           <div class="col-sm-4 text-center" id="get-started">
@@ -183,12 +182,12 @@
           <div class="col text-center" id="get-started">
             <p>{{item}}</p>
             <a
-              href="generate"
+              href="convert"
               class="btn btn-primary"
               type="button"
               style="width: 232px"
             >
-              Generate playlist</a
+              Convert Text to Speech</a
             >
           </div>
         </div>
@@ -201,18 +200,21 @@
             <h2 class="section-heading">About</h2>
             <hr class="light my-4" />
             <p class="text-faded mb-4">
-              Our aim is to create a music recommendation system/music player
-              which will detect the users face, identify the current mood and
-              then recommend a playlist based on the detected mood.<br />
+              <br />
+              Our aim is to create sign language recognition system which will
+              detect the sign performed by the users, identify the gesture and
+              then proceed to print the prediction.<br />
             </p>
           </div>
           <div class="col col-md-6 text-center">
             <h2 class="section-heading">How does it help our community?</h2>
             <hr class="light my-4" />
             <p class="text-faded mb-4">
-              <br />People often use music as a means of mood
-              regulation,specifically to change a bad mood, increase energy
-              level orreduce tension. <br /><br />
+              <br />
+              Our project provides a seamless communication experience for the
+              deaf and hard-of-hearing individuals and to break down any and all
+              communication barriers between the hearing and non-hearing
+              community <br /><br />
             </p>
           </div>
         </div>
@@ -247,9 +249,9 @@
                 data-aos-duration="200"
                 data-aos-once="true"
               ></i>
-              <h3 class="mb-3">Numerous playlists</h3>
+              <h3 class="mb-3">Numerous predictions</h3>
               <p class="text-muted mb-0">
-                Our playlists are updated regularly to give you the best
+                Our training model is updated regularly to give you the best
                 experience
               </p>
             </div>
