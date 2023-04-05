@@ -7,6 +7,7 @@ import operator
 from flask import Flask
 from flask import render_template, request, url_for, redirect, session, make_response, flash
 import capture as hand
+from gtts import gTTS
 import preprocess as preprocess
 from predict import predict
 
@@ -27,11 +28,25 @@ def capture_image():
     # img = cv2.imread("user.png")
     preprocess.roi_hand()
     preprocess.preprocess_images()
+    global prediction
     prediction = predict()
+
     print(prediction)
+    print(type(prediction))
+
 
     return render_template('index.html', item=prediction)
 
+
+@app.route('/convert')
+def text_to_speech():
+
+    language = 'en'
+    myPrediction = gTTS(text = prediction, lang = language, slow = False)
+
+    myPrediction.save("predict.mp3")
+    os.system("mpg321 prediction.mp3")
+    return render_template('convert.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

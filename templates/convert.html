@@ -115,25 +115,11 @@
         </div>
       </div>
       <div class="container">
-        
-      <div class="table">
+        <audio controls>
+          <source src="prediction.mp3" type="audio/mpeg">
+  Your browser does not support the audio tag.
+</audio>
 
-        <div class="table-header">
-          <div class="header__item">NAME</div>
-          <div class="header__item">ALBUM</div>
-          <div class="header__item">ARTIST</div>
-        </div>
-
-        {% for i in range(0,15) %}
-        <div class="table-row">		
-        
-				  <div class="table-data ">{{name[i]}}</div>
-				  <div class="table-data ">{{album[i]}}</div>
-				  <div class="table-data ">{{artist[i]}}</div>
-
-			</div>		
-		</div>
-    {%endfor%}	
 	</div>
   </div>
 </div>
