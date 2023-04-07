@@ -20,7 +20,7 @@ app.secret_key = os.urandom(10)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('home.html')
+    return render_template('index.html')
 
 @app.route('/click')
 def capture_image():
@@ -35,7 +35,7 @@ def capture_image():
     print(type(prediction))
 
 
-    return render_template('home.html', item=prediction)
+    return render_template('index.html', item=prediction)
 
 if __name__ == '__main__':
     app.run(debug=True)
