@@ -10,6 +10,7 @@ import capture as hand
 from gtts import gTTS
 import preprocess as preprocess
 from predict import predict
+import pyttsx3
 
 app = Flask(__name__)
 app_root = os.path.abspath(os.path.dirname(__file__))
@@ -19,8 +20,7 @@ app.secret_key = os.urandom(10)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-
-    return render_template('index.html')
+    return render_template('home.html')
 
 @app.route('/click')
 def capture_image():
@@ -35,18 +35,7 @@ def capture_image():
     print(type(prediction))
 
 
-    return render_template('index.html', item=prediction)
-
-
-@app.route('/convert')
-def text_to_speech():
-
-    language = 'en'
-    myPrediction = gTTS(text = prediction, lang = language, slow = False)
-
-    myPrediction.save("predict.mp3")
-    os.system("mpg321 prediction.mp3")
-    return render_template('convert.html')
+    return render_template('home.html', item=prediction)
 
 if __name__ == '__main__':
     app.run(debug=True)
