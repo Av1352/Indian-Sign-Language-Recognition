@@ -44,7 +44,7 @@ def roi_hand():
 def preprocess_images():
     image = 'roi.png'
     # reading image
-    img = imageio.imread(image)
+    img = cv2.imread(image)
     # Converting image to grayscale
     gray_img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     # Converting image to HSV format
