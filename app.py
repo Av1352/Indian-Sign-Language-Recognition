@@ -7,10 +7,9 @@ import operator
 from flask import Flask
 from flask import render_template, request, url_for, redirect, session, make_response, flash
 import capture as hand
-from gtts import gTTS
 import preprocess as preprocess
 from predict import predict
-import pyttsx3
+
 
 app = Flask(__name__)
 app_root = os.path.abspath(os.path.dirname(__file__))
