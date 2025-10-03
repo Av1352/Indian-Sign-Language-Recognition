@@ -28,15 +28,15 @@ This project aims to bridge the communication gap for the hearing-impaired by tr
 ## 📁 Project Structure
 
 sign-language-converter/
-├── app.py           # Flask app for live prediction
-├── capture.py       # Webcam capture script
-├── preprocess.py    # Data preprocessing utilities
-├── CNN.ipynb        # Model development & experiments
+├── app.py # Flask app for live prediction
+├── capture.py # Webcam capture script
+├── preprocess.py # Data preprocessing utilities
+├── CNN.ipynb # Model development & experiments
 ├── requirements.txt # Python dependencies
-├── data/            # Training & validation datasets
-├── Models/          # Saved Keras models
-├── templates/       # Flask HTML templates
-└── README.md        # Project documentation
+├── data/ # Training & validation datasets
+├── Models/ # Saved Keras models
+├── templates/ # Flask HTML templates
+└── README.md # Project documentation
 
 
 
