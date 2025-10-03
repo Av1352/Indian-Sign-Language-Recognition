@@ -28,15 +28,15 @@ This project aims to bridge the communication gap for the hearing-impaired by tr
 ## 📁 Project Structure
 
 sign-language-converter/
-├── app.py # Flask app for live prediction
-├── capture.py # Webcam capture script
-├── preprocess.py # Data preprocessing utilities
-├── CNN.ipynb # Model development & experiments
-├── requirements.txt # Python dependencies
-├── data/ # Training & validation datasets
-├── Models/ # Saved Keras models
-├── templates/ # Flask HTML templates
-└── README.md # Project documentation
+├── app.py             # Flask app for live prediction
+├── capture.py         # Webcam capture script
+├── preprocess.py      # Data preprocessing utilities
+├── CNN.ipynb          # Model development & experiments
+├── requirements.txt   # Python dependencies
+├── data/              # Training & validation datasets
+├── Models/            # Saved Keras models
+├── templates/         # Flask HTML templates
+└── README.md          # Project documentation
 
 
 ## 🚀 Getting Started
@@ -53,17 +53,15 @@ sign-language-converter/
     ```
 
 3. **Launch the application**
+   
     ```
     python app.py
-    # or run the Jupyter Notebook for model training
     ```
 
-4. **Interact via browser**
+5. **Interact via browser**
     - Access `http://localhost:5000` to use the live sign prediction web interface.
 
 ## 🔥 Results
 
 - **Validation accuracy:** 93.4% (36 ISL signs, 3 dialects)
-- **Demo:** ![Sample Prediction GIF or Screenshot](path/to/demo.gif)
 - **Confusion matrix, precision, recall plots provided in `CNN.ipynb`**
-- **Sample prediction:** `Prediction: "Hello" (97% confidence)`
