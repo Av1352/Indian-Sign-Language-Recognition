@@ -60,9 +60,6 @@ sign-language-converter/
     python app.py
     ```
 
-5. **Interact via browser**
-    - Access `http://localhost:5000` to use the live sign prediction web interface.
-
 ## 🔥 Results
 
 - **Validation accuracy:** 93.4% (36 ISL signs, 3 dialects)
