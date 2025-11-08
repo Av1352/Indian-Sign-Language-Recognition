@@ -12,7 +12,7 @@ class Preprocess:
         self.hands = self.mphands.Hands()
         self.handCascade = mp.solutions.drawing_utils
 
-    def roi_hand(self, input_img_path='user.png', output_img_path='roi.png'):
+    def roi_hand(self, input_img_path='utils/user.png', output_img_path='utils/roi.png'):
         img = imageio.imread(input_img_path)
         result = self.hands.process(img)
         hand_landmarks = result.multi_hand_landmarks
@@ -33,7 +33,7 @@ class Preprocess:
             if roi is not None:
                 cv2.imwrite(output_img_path, roi)
 
-    def preprocess_images(self, input_img_path='roi.png', output_img_path='processed.png'):
+    def preprocess_images(self, input_img_path='utils/roi.png', output_img_path='utils/processed.png'):
         img = cv2.imread(input_img_path)
         if img is None:
             raise FileNotFoundError(f"{input_img_path} not found.")

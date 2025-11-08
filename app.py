@@ -37,5 +37,24 @@ def capture_image():
 
     return render_template('index.html', item=prediction)
 
+@app.route('/upload', methods=['POST'])
+def upload():
+    file = request.files.get('file')
+    if file and file.filename:
+        filepath = os.path.join('utils', 'user.png')
+        file.save(filepath)
+        # Optionally run preprocess/predict here or redirect to main
+        # hand.capture()
+        # img = cv2.imread("user.png")
+        pre.roi_hand()
+        pre.preprocess_images()
+        global prediction
+        prediction = predict()
+
+        print(prediction)
+        print(type(prediction))
+
+        return render_template('index.html', item=prediction)
+
 if __name__ == '__main__':
     app.run(debug=True)

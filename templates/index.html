@@ -122,28 +122,30 @@
               <div class="row">
                 <div class="col-md-6 mx-auto">
                   <!-- Upload image input-->
-                  <div class="input-group mb-3 px-2 py-2 rounded-pill bg-black">
-                    <input
-                      id="upload"
-                      type="file"
-                      onchange="readURL(this);"
-                      class="form-control border-0"
-                    />
-                    <label
-                      id="upload-label"
-                      for="upload"
-                      class="font-weight-light text-muted"
-                    >Choose file&nbsp;&nbsp;</label>
-
-                    <div class="input-group-append">
+                  <form method="POST" action="/upload" enctype="multipart/form-data">
+                    <div class="input-group mb-3 px-2 py-2 rounded-pill bg-black">
+                      <input
+                        id="upload"
+                        type="file"
+                        name="file"
+                        class="form-control border-0"
+                        required
+                      />
                       <label
+                        id="upload-label"
                         for="upload"
-                        class="btn btn-light m-0 rounded-pill px-7"
-                      >
-                        <i class="fa fa-cloud-upload mr-2 text-muted"></i
-                      ></label>
+                        class="font-weight-light text-muted"
+                      >Choose file&nbsp;&nbsp;</label>
+                      <div class="input-group-append">
+                        <button
+                          type="submit"
+                          class="btn btn-light m-0 rounded-pill px-7"
+                        >
+                          <i class="fa fa-cloud-upload mr-2 text-muted"></i> Upload
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  </form>
                 </div>
               </div>
             </div>
