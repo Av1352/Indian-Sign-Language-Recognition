@@ -6,9 +6,9 @@ import time
 import operator
 from flask import Flask
 from flask import render_template, request, url_for, redirect, session, make_response, flash
-import capture as hand
-import preprocess as preprocess
-from predict import predict
+import utils.capture as hand
+import utils.preprocess as preprocess
+from utils.predict import predict
 
 
 app = Flask(__name__)
