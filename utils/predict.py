@@ -22,12 +22,11 @@ dict = {0: '0', 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8',
 
 IMG_SIZE = 100
 
-image = cv2.imread('processed.png')
-image = cv2.resize(image, (IMG_SIZE, IMG_SIZE))
-image = np.array(image).reshape(-1, IMG_SIZE, IMG_SIZE, 1)
-# h, w, c = image.shape
-
-def predict():
+def predict(image_path='processed.png', model_path='Models/model.h5'):
+    image = cv2.imread('processed.png')
+    image = cv2.resize(image, (IMG_SIZE, IMG_SIZE))
+    image = np.array(image).reshape(-1, IMG_SIZE, IMG_SIZE, 1)
+    # h, w, c = image.shape
     input_shape = (100, 100, 1)
     n_classes = 36
     model = Sequential()
@@ -53,7 +52,7 @@ def predict():
     model.add(Dropout(0.5))
     model.add(Dense(n_classes, activation='softmax'))
 
-    model.load_weights('Models/model.h5')
+    model.load_weights(model_path)
     print("Loaded model from disk")
 
     cv2.ocl.setUseOpenCL(False)
