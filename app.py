@@ -6,8 +6,8 @@ import time
 import operator
 from flask import Flask
 from flask import render_template, request, url_for, redirect, session, make_response, flash
-import utils.capture as hand
-import utils.preprocess as preprocess
+from utils.capture import capture
+from utils.preprocess import Preprocess
 from utils.predict import predict
 
 
@@ -16,6 +16,7 @@ app_root = os.path.abspath(os.path.dirname(__file__))
 
 app.secret_key = os.urandom(10)
 
+pre = Preprocess()
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -25,8 +26,8 @@ def index():
 def capture_image():
     hand.capture()
     # img = cv2.imread("user.png")
-    preprocess.roi_hand()
-    preprocess.preprocess_images()
+    pre.roi_hand()
+    pre.preprocess_images()
     global prediction
     prediction = predict()
 
