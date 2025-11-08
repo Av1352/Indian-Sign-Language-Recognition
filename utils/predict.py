@@ -22,8 +22,8 @@ dict = {0: '0', 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8',
 
 IMG_SIZE = 100
 
-def predict(image_path='processed.png', model_path='Models/model.h5'):
-    image = cv2.imread('processed.png')
+def predict(image_path='utils/processed.png', model_path='Models/model.h5'):
+    image = cv2.imread('utils/processed.png')
     image = cv2.resize(image, (IMG_SIZE, IMG_SIZE))
     image = np.array(image).reshape(-1, IMG_SIZE, IMG_SIZE, 1)
     # h, w, c = image.shape
