@@ -1,29 +1,60 @@
-# Sign Language Converter
+# ✋ Indian Sign Language Recognition (ISL)
 
-A deep learning application for real-time Indian Sign Language (ISL) recognition, converting hand gestures to text using computer vision and convolutional neural networks.
+A deep-learning–powered **Indian Sign Language (ISL) recognition system** that converts hand gestures into text using computer vision, Mediapipe hand ROI extraction, and a custom-trained CNN.
 
-## 🚩 Overview
+🚀 **Live Demo:**  
+https://indian-sign-language-recognition.streamlit.app
 
-This project aims to bridge the communication gap for the hearing-impaired by translating sign gestures from a webcam into text output. The model supports [number of gestures, e.g., 36] ISL classes and achieves high validation accuracy.
+---
 
-## 📊 Key Features
+## 📌 Overview
 
-- Real-time hand detection and gesture segmentation using OpenCV & Mediapipe
-- CNN trained on a custom dataset covering [number] ISL signs
-- Flask web interface for live predictions
-- Jupyter Notebook for data preprocessing, augmentation, model training, and evaluation
-- Comprehensive error analysis and confusion matrix plots
-- Extensible for new signs and dialects
+This project aims to bridge communication gaps for the hearing-impaired by providing a real-time ISL gesture recognition tool.  
+Users can:
 
-## 🛠 Technologies Used
+- Upload an image  
+- Capture a gesture with a webcam  
+- See the **preprocessing pipeline** (ROI extraction + edge-based model input)  
+- Get the **predicted ISL sign** instantly  
 
-- Python 3.9+
-- TensorFlow 2.x / Keras
-- OpenCV
-- Mediapipe
-- Flask
-- Jupyter Notebook
-- Docker (optional for containerization)
+The model supports **36 ISL gesture classes** and achieves **high test accuracy**.
+
+---
+
+## ⭐ Features
+
+### 🔹 Real-time Gesture Recognition
+- Upload or capture hand-sign images  
+- Fast predictions using a custom CNN  
+
+### 🔹 Advanced Computer Vision Pipeline
+- Hand detection + ROI extraction using **Mediapipe**
+- Preprocessing using edge detection, resizing, and normalization  
+
+### 🔹 Custom CNN Model
+- 36-class architecture  
+- Batch normalization + regularization  
+- Grad-CAM visualization support  
+
+### 🔹 Streamlit Web App
+- Clean, responsive UI  
+- Sidebar metrics and performance plots  
+- Confusion matrix + example predictions  
+
+---
+
+## 🛠️ Technologies Used
+
+- **Python 3.10**
+- **TensorFlow / Keras**
+- **OpenCV**
+- **Mediapipe**
+- **Streamlit**
+- **NumPy / Pandas**
+- **Matplotlib**
+- **Pillow**
+
+---
 
 ## 📁 Project Structure
 
@@ -57,10 +88,25 @@ sign-language-converter/
 3. **Launch the application**
    
     ```
-    python app.py
+    streamlit run streamlit_app/app.py
     ```
+
+### 📊 Model Performance
+
+- **Test Accuracy:** 90.6%
+- Performance visualizations available inside ```/files```
+- Detailed notebook analysis included
+
 
 ## 🔥 Results
 
-- **Validation accuracy:** 93.4% (36 ISL signs, 3 dialects)
-- **Confusion matrix, precision, recall plots provided in `CNN.ipynb`**
+- 36 ISL gestures recognized
+- Strong performance across diverse samples
+- Robust generalization due to augmentation & regularization
+- Grad-CAM explanation included
+
+## ❤️ Acknowledgments
+
+Developed to promote accessibility and support the Deaf/HoH community.
+
+*Built with ❤️ using deep learning and computer vision.*
