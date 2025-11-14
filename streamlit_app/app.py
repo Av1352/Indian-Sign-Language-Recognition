@@ -4,95 +4,144 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from PIL import Image
 from utils.preprocess import Preprocess
 from utils.predict import predict
+import pandas as pd
 import base64
 
+# --- Utility Functions ---
 def get_base64(file_path):
-    with open(file_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode()
+    with open(file_path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
 
-img_file = 'streamlit_app/header.png'
-
-try:
-    bg_base64 = get_base64(img_file)
-except Exception as e:
-    st.error(f"Could not encode {img_file}: {e}")
-    st.stop()
-    
-# --- THEME: Red + Dark (matches Flask/About) ---
-st.set_page_config(page_title="Indian Sign Language Recognition", page_icon="streamlit_app/logo.png", layout="wide")
-st.markdown(
-    f"""
-    <style>
-    /* Use header image as full background, cover entire viewport */
-    .stApp {{
-        background-image: url("data:image/jpg;base64,{bg_base64}");
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-    }}
-    .overlay-section {{
-        background: rgba(162, 61, 54, 0.88);
-        border-radius: 12px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-    }}
-    h1, h2, h3, h4, h5, h6, p, .stMarkdown, .stText {{
-        color: #fff !important;
-    }}
-    div.stButton > button {{
-        background-color: #a23d36;
-        color: #fff;
-        font-weight: bold;
-        border-radius: 25px;
-        font-size: 18px;
-    }}
-    [data-testid="stSidebar"] {{
-        background-color: #212529;
-        color: #fff;
-    }}
-    </style>
-    """,
-    unsafe_allow_html=True
+# --- Page Config ---
+st.set_page_config(
+    page_title="Indian Sign Language Recognition",
+    page_icon="streamlit_app/logo.png",
+    layout="wide"
 )
 
+# --- Background Image ---
+bg_image_path = "streamlit_app/header.png"
+try:
+    bg_base64 = get_base64(bg_image_path)
+except Exception as e:
+    st.error(f"Could not load background image: {e}")
+    st.stop()
 
-# --- SIDEBAR: Metrics and Plots ---
+# --- CSS ---
+st.markdown(f"""
+<style>
+.stApp {{
+    background-image: url("data:image/png;base64,{bg_base64}");
+    background-size: cover;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}}
+
+h1, h2, h3, h4, h5, h6, p {{
+    color: #ffffff !important;
+    font-family: 'Segoe UI', sans-serif;
+}}
+
+div.stButton > button {{
+    background-color: #a23d36;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 0.5rem 1.2rem;
+    font-size: 16px;
+    transition: transform 0.2s;
+}}
+div.stButton > button:hover {{
+    transform: scale(1.05);
+}}
+
+[data-testid="stSidebar"] {{
+    background-color: rgba(33, 37, 41, 0.95);
+    color: #fff;
+    padding: 1rem;
+    border-right: 1px solid #222;
+}}
+
+img {{
+    border-radius: 6px;
+}}
+</style>
+""", unsafe_allow_html=True)
+
+# --- Sidebar ---
 st.sidebar.image("streamlit_app/logo.png", width=80)
 st.sidebar.title("📊 Model Performance")
-st.sidebar.metric("Test Accuracy", "93.4%")
-st.sidebar.metric("ROC AUC", "0.96")
+st.sidebar.metric("TTA Test Accuracy", "90.6%")
 
 with st.sidebar.expander("Model Details", expanded=True):
     st.markdown("""
-    **Architecture:** Custom CNN  
-    **Input:** 64x64x3  
-    **Epochs:** 25  
-    **Metrics:** F1, ROC, Confusion Matrix
-    """)
+- **Architecture:** Custom CNN  
+- **Input:** 100x100x1  
+- **Epochs:** 30  
+- **Metrics:** F1, Confusion Matrix
+""")
 
+# --- Classification Report (as a dataframe) ---
+
+report_data = {
+    "Class": [
+        '0','1','2','3','4','5','6','7','8','9',
+        'a','b','c','d','e','f','g','h','i','j',
+        'k','l','m','n','o','p','q','r','s','t',
+        'u','v','w','x','y','z'
+    ],
+    "Precision": [
+        0.84,0.95,0.81,0.88,0.93,0.96,0.99,0.82,0.74,0.95,
+        1.00,1.00,0.98,0.99,0.71,0.93,0.93,0.99,0.99,0.99,
+        0.98,1.00,0.97,0.77,0.99,0.95,0.71,0.90,0.79,0.98,
+        0.73,0.98,1.00,0.99,0.98,1.00
+    ],
+    "Recall": [
+        0.96,0.97,0.90,0.99,0.93,0.95,0.94,0.91,1.00,0.84,
+        0.98,0.69,0.89,0.96,0.85,0.70,0.95,0.93,0.87,0.76,
+        0.95,0.90,0.73,0.98,0.75,0.99,1.00,0.79,1.00,0.97,
+        1.00,0.81,0.99,0.99,0.92,0.95
+    ],
+    "F1-Score": [
+        0.90,0.96,0.85,0.93,0.93,0.95,0.96,0.86,0.85,0.89,
+        0.99,0.82,0.93,0.98,0.77,0.80,0.94,0.96,0.92,0.86,
+        0.97,0.95,0.83,0.86,0.86,0.97,0.83,0.84,0.89,0.97,
+        0.84,0.88,0.99,0.99,0.95,0.97
+    ],
+    "Support": [
+        201]*36
+}
+
+report_df = pd.DataFrame(report_data)
+
+with st.sidebar.expander("Classification Report", expanded=True):
+    st.dataframe(report_df, height=300)
+
+# --- Sidebar Tabs: Predictions & Confusion Matrix ---
 st.sidebar.header("Evaluation Visuals")
-tab_roc, tab_conf = st.sidebar.tabs(["ROC Curve", "ConfMatrix"])
-if os.path.exists("files/roc_curve.png"):
-    with tab_roc:
-        st.image("files/roc_curve.png", caption="ROC Curve", use_container_width=True)
-if os.path.exists("files/conf_matrix.png"):
-    with tab_conf:
-        st.image("files/conf_matrix.png", caption="Confusion Matrix", use_container_width=True)
-if os.path.exists("files/accuracy plot.png"):
-    st.sidebar.image("files/accuracy plot.png", caption="Accuracy Curve", use_container_width=True)
-if os.path.exists("files/loss - cnn - 99.png"):
-    st.sidebar.image("files/loss - cnn - 99.png", caption="Loss Curve", use_container_width=True)
+tab_pred, tab_conf = st.sidebar.tabs(["Predictions", "Confusion Matrix"])
 
-# --- MAIN PANEL: App logic ---
+with tab_pred:
+    if os.path.exists("files/output.png"):
+        st.image("files/output.png", caption="Model Predictions", use_container_width=True)
+
+with tab_conf:
+    if os.path.exists("files/conf_matrix.png"):
+        st.image("files/conf_matrix.png", caption="Confusion Matrix", use_container_width=True)
+
+
+# --- Main Panel ---
 st.image("streamlit_app/logo.png", width=100)
 st.title("INDIAN SIGN LANGUAGE RECOGNITION SYSTEM")
-st.write("We can help you communicate with the world.")
+st.write("Helping you communicate with the world.")
+
 st.header("About")
-st.write("Our aim is to create sign language recognition system which will detect the sign performed by the users, identify the gesture and then proceed to print the prediction.")
-st.markdown("</div>", unsafe_allow_html=True)
+st.write("""
+Our system detects hand gestures and predicts corresponding sign language symbols.
+Designed to help bridge communication between hearing and non-hearing individuals.
+""")
 
-st.markdown("## Upload or Capture Hand Image")
-
+st.header("Upload or Capture Hand Image")
 uploaded_file = st.file_uploader("Upload a hand sign image", type=["png", "jpg", "jpeg"])
 camera_img = st.camera_input("Or take a picture")
 
@@ -111,37 +160,31 @@ elif camera_img:
     img.save(input_image_path)
 
 if input_image_path:
-    st.markdown("### Input Image")
-    st.image(input_image_path, caption="Uploaded Input", use_container_width=True)
+    st.subheader("Input Image")
+    st.image(input_image_path, caption="Uploaded Input", width=400)
 
     roi_img_path = os.path.join(utils_dir, "roi.png")
     processed_img_path = os.path.join(utils_dir, "processed.png")
     gradcam_img_path = os.path.join(utils_dir, "gradcam.png")
 
-    # Preprocessing pipeline
     pre.roi_hand(input_img_path=input_image_path, output_img_path=roi_img_path)
     pre.preprocess_images(input_img_path=roi_img_path, output_img_path=processed_img_path)
 
-    st.markdown("### Region of Interest (ROI)")
-    st.image(roi_img_path, caption="Detected Hand Region", use_container_width=True)
+    st.subheader("Region of Interest (ROI)")
+    st.image(roi_img_path, caption="Detected Hand Region", width=400)
 
-    st.markdown("### Preprocessed Image (Model Input)")
-    st.image(processed_img_path, caption="Edge-detected Hand", use_container_width=True)
+    st.subheader("Preprocessed Image")
+    st.image(processed_img_path, caption="Model Input", width=400)
 
-    # Grad-CAM display if available
     if os.path.exists(gradcam_img_path):
-        st.markdown("### Grad-CAM Visualization")
-        st.image(gradcam_img_path, caption="Model Focus (Grad-CAM)", use_container_width=True)
+        st.subheader("Grad-CAM Visualization")
+        st.image(gradcam_img_path, caption="Model Focus", width=400)
 
-    # Prediction
-    prediction = predict(image_path=processed_img_path)
-    st.success(f"The predicted sign is: **{prediction}**")
-
+    label, confidence = predict(image_path=processed_img_path)
+    st.success(f"Predicted Sign: **{label}** (Confidence: {confidence:.2f})")
 else:
     st.info("Please upload an image or take a picture to continue.")
 
 st.markdown("---")
-st.button("GET STARTED!", help="Begin prediction!", type="primary")
-
+st.button("GET STARTED!", help="Begin prediction!")
 st.markdown("#### Made with ❤️ to bridge the hearing/non-hearing gap.")
-

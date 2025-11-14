@@ -1,75 +1,36 @@
 import numpy as np
 import cv2
-from keras.models import Sequential, model_from_json
-from keras.layers import Dense, Dropout, Flatten
-from keras.layers import Conv2D
-from keras.optimizers import Adam
-from keras.layers import MaxPooling2D
-
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from keras.preprocessing import image
-
-import time
-import pandas as pd
-import mediapipe as mp
-
-show_text = [0]
-dict = {0: '0', 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 
-        9: '9', 10: 'a', 11: 'b', 12: 'c', 13: 'd', 14: 'e', 15: 'f', 16: 'g', 
-        17: 'h', 18: 'i', 19: 'j', 20: 'k', 21: 'l', 22: 'm', 23: 'n', 24: 'o', 
-        25: 'p', 26: 'q', 27: 'r', 28: 's', 29: 't', 30: 'u', 31: 'v', 32: 'w', 
-        33: 'x', 34: 'y', 35: 'z'}
-
+import tensorflow as tf
+import streamlit as st
 IMG_SIZE = 100
 
-def predict(image_path='utils/processed.png', model_path='Models/model.h5'):
-    image = cv2.imread('utils/processed.png')
-    image = cv2.resize(image, (IMG_SIZE, IMG_SIZE))
-    image = np.array(image).reshape(-1, IMG_SIZE, IMG_SIZE, 1)
-    # h, w, c = image.shape
-    input_shape = (100, 100, 1)
-    n_classes = 36
-    model = Sequential()
-    # The first two layers with 32 filters of window size 3x3
-    model.add(Conv2D(32, (3, 3), padding='same',
-                    activation='relu', input_shape=input_shape))
-    model.add(Conv2D(32, (3, 3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.25))
+CLASS_MAP = {
+    i: c for i, c in enumerate(
+        ['0','1','2','3','4','5','6','7','8','9',
+        'a','b','c','d','e','f','g','h','i','j',
+        'k','l','m','n','o','p','q','r','s','t',
+        'u','v','w','x','y','z']
+    )
+}
 
-    model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
-    model.add(Conv2D(64, (3, 3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.25))
+@st.cache_resource
+def load_model(model_path="Models/best_model.keras"):
+    model = tf.keras.models.load_model(model_path)
+    return model
 
-    model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
-    model.add(Conv2D(64, (3, 3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.25))
+@st.cache_data
+def preprocess_image(path="utils/processed.png"):
+    img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+    img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
+    img = img.astype("float32") / 255.0
+    img = np.expand_dims(img, axis=-1)   # (100,100,1)
+    img = np.expand_dims(img, axis=0)    # (1,100,100,1)
+    return img
 
-    model.add(Flatten())
-    model.add(Dense(512, activation='relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(n_classes, activation='softmax'))
-
-    model.load_weights(model_path)
-    print("Loaded model from disk")
-
-    cv2.ocl.setUseOpenCL(False)
-    prediction = model.predict(image)
-    # print(prediction)
-
-    global maxindex
-    maxindex = int(np.argmax(prediction))
-    show_text[0] = maxindex
-
-    print("dict: ", dict[maxindex])
-    global hand
-    hand = dict[maxindex]
-    print("Hand", hand)
-
-    return hand
-
-
-if __name__ == '__main__':
-    predict()
+def predict(image_path="utils/processed.png", model_path="Models/best_model.keras"):
+    model = load_model(model_path)
+    img = preprocess_image(image_path)
+    pred = model.predict(img)
+    class_idx = int(np.argmax(pred))
+    confidence = float(np.max(pred))
+    return CLASS_MAP[class_idx], confidence
