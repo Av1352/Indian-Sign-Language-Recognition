@@ -1,12 +1,10 @@
-keras
-mediapipe
-pandas
-matplotlib
-streamlit==1.51.0
+streamlit==1.32.0
 tensorflow-cpu==2.15.0
 mediapipe==0.10.21
 numpy==1.26.4
 protobuf==4.25.3
-opencv-python
-Pillow
+opencv-python-headless==4.7.0.72
+Pillow==10.2.0
+pandas
+matplotlib
 scikit-learn
