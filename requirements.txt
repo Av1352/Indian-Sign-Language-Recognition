@@ -1,7 +1,12 @@
-tensorflow
 keras
 mediapipe
 pandas
 matplotlib
-numpy
+streamlit==1.51.0
+tensorflow-cpu==2.15.0
+mediapipe==0.10.21
+numpy==1.26.4
+protobuf==4.25.3
 opencv-python
+Pillow
+scikit-learn
