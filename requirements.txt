@@ -8,5 +8,4 @@ Pillow
 scikit-learn
 matplotlib
 pandas
-keras
 imageio
