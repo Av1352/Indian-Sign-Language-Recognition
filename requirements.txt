@@ -7,3 +7,4 @@ pandas
 imageio
 numpy<2.0.0
 huggingface-hub
+tensorflow-addons>=0.23.0
