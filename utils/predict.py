@@ -19,38 +19,26 @@ CLASS_MAP = {
 
 @st.cache_resource
 def load_model():
-    local_model_path = "local_best_model.keras"
+    local_model_path = "best_model.h5"
     
-    try:
-        # Download from Hugging Face
-        hf_model_path = hf_hub_download(
-            repo_id="Av1352/indian-sign-language-model",
-            filename="best_model.keras"
-        )
-        
-        # Copy to a local path with proper permissions
-        shutil.copy2(hf_model_path, local_model_path)
-        st.success(f"Model copied successfully ({os.path.getsize(local_model_path)} bytes)")
-        
-    except Exception as e:
-        st.error(f"Failed to download from Hugging Face: {e}")
-        raise
+    if not os.path.exists(local_model_path):
+        try:
+            hf_model_path = hf_hub_download(
+                repo_id="Av1352/indian-sign-language-model",
+                filename="best_model.h5"  # Changed to .h5
+            )
+            shutil.copy2(hf_model_path, local_model_path)
+            st.success(f"Model downloaded ({os.path.getsize(local_model_path) / (1024*1024):.1f} MB)")
+        except Exception as e:
+            st.error(f"Download failed: {e}")
+            raise
     
-    # Now try loading from the local copy
     try:
         import tensorflow_addons as tfa
-        custom_objects = {'AdamW': tfa.optimizers.AdamW, 'Addons>AdamW': tfa.optimizers.AdamW}
+        custom_objects = {'AdamW': tfa.optimizers.AdamW}
         model = tf.keras.models.load_model(local_model_path, custom_objects=custom_objects)
-        st.success("✅ Model loaded successfully!")
         return model
-    except ImportError:
-        st.warning("Loading without TensorFlow Addons...")
-        model = tf.keras.models.load_model(local_model_path, compile=False)
-        model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-        return model
-    except Exception as e:
-        st.error(f"Loading error: {str(e)}")
-        # Try one more time with compile=False
+    except:
         model = tf.keras.models.load_model(local_model_path, compile=False)
         model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
         return model
