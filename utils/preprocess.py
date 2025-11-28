@@ -32,13 +32,15 @@ class Preprocess:
                 roi = img[y_min:y_max, x_min:x_max]
             if roi is not None:
                 cv2.imwrite(output_img_path, roi)
+        if roi is None:
+            raise ValueError("No hand detected — please upload a clearer image.")
 
     def preprocess_images(self, input_img_path='utils/roi.png', output_img_path='utils/processed.png'):
         img = cv2.imread(input_img_path)
         if img is None:
             raise FileNotFoundError(f"{input_img_path} not found.")
-        gray_img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-        hsv_img = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         skin_color_lower = np.array([0, 40, 30], np.uint8)
         skin_color_upper = np.array([43, 255, 255], np.uint8)
         skin_mask = cv2.inRange(hsv_img, skin_color_lower, skin_color_upper)
