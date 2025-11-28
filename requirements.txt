@@ -3,14 +3,17 @@ tensorflow-cpu==2.15.0
 mediapipe==0.10.21
 numpy==1.26.4
 protobuf==4.25.3
-opencv-python-headless==4.8.1.78
+
+# FORCE only headless OpenCV
+opencv-python-headless==4.10.0.84
+
+# Prevent pip from installing GUI opencv via mediapipe
+opencv-python==0.0.0
+opencv-contrib-python==0.0.0
+
 Pillow
 scikit-learn
 matplotlib
 pandas
 imageio
 seaborn
-
-# Block OpenCV GUI packages which cause libGL.so.1 error
-opencv-python<4.8
-opencv-contrib-python<4.8
