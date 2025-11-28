@@ -31,14 +31,22 @@ class Preprocess:
                 cv2.rectangle(img, (x_min, y_min), (x_max, y_max), (0, 255, 0), 2)
                 roi = img[y_min:y_max, x_min:x_max]
             if roi is not None:
+                # Ensure directory exists
+                os.makedirs(os.path.dirname(output_img_path), exist_ok=True)
                 cv2.imwrite(output_img_path, roi)
+                print(f'ROI saved to {output_img_path}')
+                return output_img_path
         if roi is None:
             raise ValueError("No hand detected — please upload a clearer image.")
 
     def preprocess_images(self, input_img_path='utils/roi.png', output_img_path='utils/processed.png'):
+        if not os.path.exists(input_img_path):
+            raise FileNotFoundError(f"{input_img_path} not found.")
+            
         img = cv2.imread(input_img_path)
         if img is None:
-            raise FileNotFoundError(f"{input_img_path} not found.")
+            raise FileNotFoundError(f"Could not read {input_img_path}.")
+            
         gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         skin_color_lower = np.array([0, 40, 30], np.uint8)
@@ -50,9 +58,17 @@ class Preprocess:
         skin_mask = cv2.morphologyEx(skin_mask, cv2.MORPH_CLOSE, kernel)
         hand = cv2.bitwise_and(gray_img, gray_img, mask=skin_mask)
         canny = cv2.Canny(hand, 60, 60)
+        
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(output_img_path), exist_ok=True)
         cv2.imwrite(output_img_path, canny)
-        print('Preprocessed image saved')
-        # return canny
+        
+        # Verify the file was saved
+        if os.path.exists(output_img_path):
+            print(f'Preprocessed image saved to {output_img_path}')
+            return output_img_path
+        else:
+            raise RuntimeError(f"Failed to save preprocessed image to {output_img_path}")
 
 # For script usage
 # if __name__ == '__main__':
