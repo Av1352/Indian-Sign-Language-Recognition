@@ -3,6 +3,7 @@ import cv2
 import tensorflow as tf
 import streamlit as st
 import os
+import requests
 
 IMG_SIZE = 100
 
@@ -17,42 +18,41 @@ CLASS_MAP = {
 
 @st.cache_resource
 def load_model(model_path="Models/best_model.keras"):
-    # Get the absolute path
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    # Try multiple possible paths
-    possible_paths = [
-        model_path,  # Relative path
-        os.path.join(current_dir, "..", model_path),  # From utils/ directory
-        os.path.join("/mount/src/indian-sign-language-recognition", model_path),  # Absolute Streamlit path
-        os.path.abspath(model_path),  # Absolute from current
-    ]
-    
-    model_file = None
-    for path in possible_paths:
-        st.write(f"Checking path: {path}")  # Debug output
-        if os.path.exists(path):
-            model_file = path
-            st.write(f"✅ Found model at: {path}")
-            break
-    
-    if model_file is None:
-        # List what's actually available
-        st.error("Model file not found! Checking available files...")
+    # Check if model exists and is actually a model file (not a Git LFS pointer)
+    if os.path.exists(model_path):
+        file_size = os.path.getsize(model_path)
+        # Git LFS pointer files are tiny (< 200 bytes)
+        if file_size < 500:
+            st.warning(f"Model file appears to be a Git LFS pointer ({file_size} bytes). Downloading actual model...")
+            # Download from GitHub's LFS
+            url = "https://github.com/Av1352/Indian-Sign-Language-Recognition/raw/main/Models/best_model.keras"
+            os.makedirs(os.path.dirname(model_path), exist_ok=True)
+            
+            response = requests.get(url, stream=True)
+            if response.status_code == 200:
+                with open(model_path, 'wb') as f:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                st.success("Model downloaded successfully!")
+            else:
+                st.error(f"Failed to download model: {response.status_code}")
+                raise FileNotFoundError("Could not download model from GitHub")
+    else:
+        st.error(f"Model file not found at {model_path}")
         st.write(f"Current directory: {os.getcwd()}")
-        st.write(f"Files in current dir: {os.listdir('.')}")
+        st.write(f"Directory contents: {os.listdir('.')}")
         if os.path.exists('Models'):
-            st.write(f"Files in Models/: {os.listdir('Models')}")
-        raise FileNotFoundError(f"Could not find model at any of these paths: {possible_paths}")
+            st.write(f"Models directory: {os.listdir('Models')}")
+        raise FileNotFoundError(f"Model file not found: {model_path}")
     
     try:
         # Try to import tensorflow_addons for AdamW
         import tensorflow_addons as tfa
         custom_objects = {'AdamW': tfa.optimizers.AdamW, 'Addons>AdamW': tfa.optimizers.AdamW}
-        model = tf.keras.models.load_model(model_file, custom_objects=custom_objects)
+        model = tf.keras.models.load_model(model_path, custom_objects=custom_objects)
         return model
     except ImportError:
-        model = tf.keras.models.load_model(model_file, compile=False)
+        model = tf.keras.models.load_model(model_path, compile=False)
         model.compile(
             optimizer='adam',
             loss='sparse_categorical_crossentropy',
@@ -60,7 +60,7 @@ def load_model(model_path="Models/best_model.keras"):
         )
         return model
     except Exception as e:
-        model = tf.keras.models.load_model(model_file, compile=False)
+        model = tf.keras.models.load_model(model_path, compile=False)
         model.compile(
             optimizer='adam',
             loss='sparse_categorical_crossentropy',
