@@ -1,7 +1,5 @@
 import os
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 import cv2
 import imageio.v2 as imageio
 import mediapipe as mp
@@ -36,14 +34,11 @@ class Preprocess:
                 x_max = min(w, x_max + padding)
                 y_max = min(h, y_max + padding)
                 
-                cv2.rectangle(img, (x_min, y_min), (x_max, y_max), (0, 255, 0), 2)
                 roi = img[y_min:y_max, x_min:x_max]
             
             if roi is not None:
                 os.makedirs(os.path.dirname(output_img_path), exist_ok=True)
-                # Just save directly - imageio reads as RGB, we'll convert in next step
                 cv2.imwrite(output_img_path, cv2.cvtColor(roi, cv2.COLOR_RGB2BGR))
-                print(f'ROI saved to {output_img_path}')
                 return output_img_path
         
         if roi is None:
@@ -52,12 +47,12 @@ class Preprocess:
     def preprocess_images(self, input_img_path='utils/roi.png', output_img_path='utils/processed.png'):
         if not os.path.exists(input_img_path):
             raise FileNotFoundError(f"{input_img_path} not found.")
-            
-        img = cv2.imread(input_img_path, cv2.IMREAD_GRAYSCALE)  # Read as grayscale
+        
+        # MATCH YOUR TRAINING: just grayscale and resize
+        img = cv2.imread(input_img_path, cv2.IMREAD_GRAYSCALE)
         if img is None:
             raise FileNotFoundError(f"Could not read {input_img_path}.")
         
-        # Just resize to 100x100 - EXACTLY like training
         new_img = cv2.resize(img, (100, 100))
         
         os.makedirs(os.path.dirname(output_img_path), exist_ok=True)
