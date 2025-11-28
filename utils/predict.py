@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import tensorflow as tf
 import streamlit as st
+import os
 
 IMG_SIZE = 100
 
@@ -15,35 +16,56 @@ CLASS_MAP = {
 }
 
 @st.cache_resource
-def load_model(model_path="../Models/best_model.keras"):
+def load_model(model_path="Models/best_model.keras"):
+    # Get the absolute path
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    # Try multiple possible paths
+    possible_paths = [
+        model_path,  # Relative path
+        os.path.join(current_dir, "..", model_path),  # From utils/ directory
+        os.path.join("/mount/src/indian-sign-language-recognition", model_path),  # Absolute Streamlit path
+        os.path.abspath(model_path),  # Absolute from current
+    ]
+    
+    model_file = None
+    for path in possible_paths:
+        st.write(f"Checking path: {path}")  # Debug output
+        if os.path.exists(path):
+            model_file = path
+            st.write(f"✅ Found model at: {path}")
+            break
+    
+    if model_file is None:
+        # List what's actually available
+        st.error("Model file not found! Checking available files...")
+        st.write(f"Current directory: {os.getcwd()}")
+        st.write(f"Files in current dir: {os.listdir('.')}")
+        if os.path.exists('Models'):
+            st.write(f"Files in Models/: {os.listdir('Models')}")
+        raise FileNotFoundError(f"Could not find model at any of these paths: {possible_paths}")
+    
     try:
         # Try to import tensorflow_addons for AdamW
         import tensorflow_addons as tfa
         custom_objects = {'AdamW': tfa.optimizers.AdamW, 'Addons>AdamW': tfa.optimizers.AdamW}
-        model = tf.keras.models.load_model(model_path, custom_objects=custom_objects)
-        print(f"Model loaded with TensorFlow Addons")
+        model = tf.keras.models.load_model(model_file, custom_objects=custom_objects)
         return model
     except ImportError:
-        print("TensorFlow Addons not found, loading without optimizer...")
-        # Load without compiling, then recompile with standard Adam
-        model = tf.keras.models.load_model(model_path, compile=False)
+        model = tf.keras.models.load_model(model_file, compile=False)
         model.compile(
             optimizer='adam',
             loss='sparse_categorical_crossentropy',
             metrics=['accuracy']
         )
-        print(f"Model loaded and recompiled with Adam optimizer")
         return model
     except Exception as e:
-        print(f"Error with custom objects: {e}, trying compile=False...")
-        # Fallback: load without optimizer
-        model = tf.keras.models.load_model(model_path, compile=False)
+        model = tf.keras.models.load_model(model_file, compile=False)
         model.compile(
             optimizer='adam',
             loss='sparse_categorical_crossentropy',
             metrics=['accuracy']
         )
-        print(f"Model loaded with fallback method")
         return model
 
 @st.cache_data
@@ -62,5 +84,5 @@ def predict(image_path="utils/processed.png", model_path="Models/best_model.kera
     img = preprocess_image(image_path)
     pred = model.predict(img, verbose=0)
     class_idx = int(np.argmax(pred))
-    confidence = float(np.max(pred)) * 100  # Convert to percentage
+    confidence = float(np.max(pred)) * 100
     return CLASS_MAP[class_idx], confidence
