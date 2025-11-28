@@ -1,11 +1,17 @@
 import streamlit as st
 import os, sys
+import tempfile
+import uuid
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from PIL import Image
 from utils.preprocess import Preprocess
 from utils.predict import predict
 import pandas as pd
 import base64
+
+# Initialize session-specific directory
+if 'session_id' not in st.session_state:
+    st.session_state.session_id = str(uuid.uuid4())
 
 # --- Utility Functions ---
 def get_base64(file_path):
@@ -148,13 +154,16 @@ pre = Preprocess()
 utils_dir = os.path.join(os.getcwd(), "utils")
 os.makedirs(utils_dir, exist_ok=True)
 
+session_dir = os.path.join(tempfile.gettempdir(), f"isl_{st.session_state.session_id}")
+os.makedirs(session_dir, exist_ok=True)
+
 input_image_path = None
 if uploaded_file:
-    input_image_path = os.path.join(utils_dir, "user.png")
+    input_image_path = os.path.join(session_dir, "user.png")
     with open(input_image_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 elif camera_img:
-    input_image_path = os.path.join(utils_dir, "user.png")
+    input_image_path = os.path.join(session_dir, "user.png")
     img = Image.open(camera_img)
     img.save(input_image_path)
 
@@ -162,15 +171,20 @@ if input_image_path:
     st.subheader("Input Image")
     st.image(input_image_path, caption="Uploaded Input", width=400)
 
-    roi_img_path = os.path.join(utils_dir, "roi.png")
-    processed_img_path = os.path.join(utils_dir, "processed.png")
-    gradcam_img_path = os.path.join(utils_dir, "gradcam.png")
+    # Use session-specific paths
+    roi_img_path = os.path.join(session_dir, "roi.png")
+    processed_img_path = os.path.join(session_dir, "processed.png")
+    gradcam_img_path = os.path.join(session_dir, "gradcam.png")
+    
+    # Clean up old files in this session
+    for old_file in [roi_img_path, processed_img_path, gradcam_img_path]:
+        if os.path.exists(old_file):
+            os.remove(old_file)
     
     try:
-        # Process the image and get the actual saved paths
+        # Process the image
         saved_roi_path = pre.roi_hand(input_img_path=input_image_path, output_img_path=roi_img_path)
         
-        # Verify ROI was saved
         if not os.path.exists(roi_img_path):
             st.error("Failed to detect hand region. Please try a clearer image.")
             st.stop()
@@ -180,25 +194,18 @@ if input_image_path:
 
         saved_processed_path = pre.preprocess_images(input_img_path=roi_img_path, output_img_path=processed_img_path)
         
-        # Verify processed image was saved
         if not os.path.exists(processed_img_path):
             st.error("Failed to preprocess image.")
             st.stop()
             
         st.subheader("Preprocessed Image")
         st.image(processed_img_path, caption="Model Input", width=400)
-        
-        # DEBUG: Show the actual array values
-        import cv2
-        import numpy as np
-        debug_img = cv2.imread(processed_img_path, cv2.IMREAD_GRAYSCALE)
-        st.write(f"**Debug Info:**")
-        st.write(f"- Shape: {debug_img.shape}")
-        st.write(f"- Min/Max values: {debug_img.min()}/{debug_img.max()}")
-        st.write(f"- Mean: {debug_img.mean():.2f}")
-        st.write(f"- Non-zero pixels: {np.count_nonzero(debug_img)}/{debug_img.size}")
 
-        # Now predict with verification
+        if os.path.exists(gradcam_img_path):
+            st.subheader("Grad-CAM Visualization")
+            st.image(gradcam_img_path, caption="Model Focus", width=400)
+
+        # Now predict
         label, confidence = predict(image_path=processed_img_path)
         st.success(f"Predicted Sign: **{label}** (Confidence: {confidence:.2f})")
         
