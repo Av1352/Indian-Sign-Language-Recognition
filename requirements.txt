@@ -1,6 +1,5 @@
 streamlit
-tensorflow>=2.13.0,<2.18.0
-tensorflow-addons
+tensorflow==2.15.0
 opencv-python-headless
 mediapipe>=0.10.0
 Pillow

@@ -25,7 +25,7 @@ def load_model():
         try:
             hf_model_path = hf_hub_download(
                 repo_id="Av1352/indian-sign-language-model",
-                filename="best_model.h5"  # Changed to .h5
+                filename="best_model.h5"
             )
             shutil.copy2(hf_model_path, local_model_path)
             st.success(f"Model downloaded ({os.path.getsize(local_model_path) / (1024*1024):.1f} MB)")
@@ -33,15 +33,48 @@ def load_model():
             st.error(f"Download failed: {e}")
             raise
     
+    # Try multiple loading strategies
     try:
-        import tensorflow_addons as tfa
-        custom_objects = {'AdamW': tfa.optimizers.AdamW}
-        model = tf.keras.models.load_model(local_model_path, custom_objects=custom_objects)
+        # Strategy 1: Load with compile=False and safe_mode
+        st.write("Loading model...")
+        model = tf.keras.models.load_model(
+            local_model_path, 
+            compile=False,
+            safe_mode=False  # Disable strict loading
+        )
+        
+        # Recompile with simple optimizer
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+            loss='sparse_categorical_crossentropy',
+            metrics=['accuracy']
+        )
+        st.success("✅ Model loaded successfully!")
         return model
-    except:
-        model = tf.keras.models.load_model(local_model_path, compile=False)
-        model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-        return model
+        
+    except Exception as e1:
+        st.warning(f"First attempt failed: {e1}")
+        
+        try:
+            # Strategy 2: Load with legacy optimizer handling
+            from tensorflow.keras.optimizers.legacy import Adam
+            
+            model = tf.keras.models.load_model(
+                local_model_path,
+                compile=False
+            )
+            
+            model.compile(
+                optimizer=Adam(learning_rate=0.001),
+                loss='sparse_categorical_crossentropy',
+                metrics=['accuracy']
+            )
+            st.success("✅ Model loaded with legacy optimizer!")
+            return model
+            
+        except Exception as e2:
+            st.error(f"All loading strategies failed. Error: {e2}")
+            raise
 
 @st.cache_data
 def preprocess_image(path="utils/processed.png"):
