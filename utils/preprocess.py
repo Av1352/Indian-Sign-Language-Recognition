@@ -29,7 +29,7 @@ class Preprocess:
                     y_max = max(y_max, y)
                     y_min = min(y_min, y)
                 
-                # Add padding around the hand
+                # Add padding
                 padding = 20
                 x_min = max(0, x_min - padding)
                 y_min = max(0, y_min - padding)
@@ -41,9 +41,8 @@ class Preprocess:
             
             if roi is not None:
                 os.makedirs(os.path.dirname(output_img_path), exist_ok=True)
-                # Convert RGB to BGR for cv2
-                roi_bgr = cv2.cvtColor(roi, cv2.COLOR_RGB2BGR)
-                cv2.imwrite(output_img_path, roi_bgr)
+                # Just save directly - imageio reads as RGB, we'll convert in next step
+                cv2.imwrite(output_img_path, cv2.cvtColor(roi, cv2.COLOR_RGB2BGR))
                 print(f'ROI saved to {output_img_path}')
                 return output_img_path
         
@@ -54,31 +53,15 @@ class Preprocess:
         if not os.path.exists(input_img_path):
             raise FileNotFoundError(f"{input_img_path} not found.")
             
-        img = cv2.imread(input_img_path)
+        img = cv2.imread(input_img_path, cv2.IMREAD_GRAYSCALE)  # Read as grayscale
         if img is None:
             raise FileNotFoundError(f"Could not read {input_img_path}.")
         
-        # Resize first
-        img = cv2.resize(img, (100, 100))
-        
-        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        
-        # Skin color detection
-        skin_color_lower = np.array([0, 40, 30], np.uint8)
-        skin_color_upper = np.array([43, 255, 255], np.uint8)
-        skin_mask = cv2.inRange(hsv_img, skin_color_lower, skin_color_upper)
-        skin_mask = cv2.medianBlur(skin_mask, 5)
-        skin_mask = cv2.addWeighted(skin_mask, 0.5, skin_mask, 0.5, 0.0)
-        
-        kernel = np.ones((5, 5), np.uint8)
-        skin_mask = cv2.morphologyEx(skin_mask, cv2.MORPH_CLOSE, kernel)
-        
-        hand = cv2.bitwise_and(gray_img, gray_img, mask=skin_mask)
-        canny = cv2.Canny(hand, 60, 60)
+        # Just resize to 100x100 - EXACTLY like training
+        new_img = cv2.resize(img, (100, 100))
         
         os.makedirs(os.path.dirname(output_img_path), exist_ok=True)
-        cv2.imwrite(output_img_path, canny)
+        cv2.imwrite(output_img_path, new_img)
         
         if os.path.exists(output_img_path):
             print(f'Preprocessed image saved to {output_img_path}')
