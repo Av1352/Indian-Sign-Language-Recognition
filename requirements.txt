@@ -7,3 +7,4 @@ Pillow
 pandas
 imageio
 numpy<2.0.0
+requests
