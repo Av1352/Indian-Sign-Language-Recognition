@@ -15,7 +15,7 @@ CLASS_MAP = {
 }
 
 @st.cache_resource
-def load_model(model_path="Models/best_model.keras"):
+def load_model(model_path="../Models/best_model.keras"):
     try:
         # Try to import tensorflow_addons for AdamW
         import tensorflow_addons as tfa

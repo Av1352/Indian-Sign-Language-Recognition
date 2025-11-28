@@ -1,9 +1,9 @@
 streamlit
-tensorflow>=2.13.0
+tensorflow>=2.13.0,<2.18.0
 tensorflow-addons
 opencv-python-headless
-mediapipe
+mediapipe>=0.10.0
 Pillow
 pandas
 imageio
-numpy
+numpy<2.0.0
