@@ -187,10 +187,16 @@ if input_image_path:
             
         st.subheader("Preprocessed Image")
         st.image(processed_img_path, caption="Model Input", width=400)
-
-        if os.path.exists(gradcam_img_path):
-            st.subheader("Grad-CAM Visualization")
-            st.image(gradcam_img_path, caption="Model Focus", width=400)
+        
+        # DEBUG: Show the actual array values
+        import cv2
+        import numpy as np
+        debug_img = cv2.imread(processed_img_path, cv2.IMREAD_GRAYSCALE)
+        st.write(f"**Debug Info:**")
+        st.write(f"- Shape: {debug_img.shape}")
+        st.write(f"- Min/Max values: {debug_img.min()}/{debug_img.max()}")
+        st.write(f"- Mean: {debug_img.mean():.2f}")
+        st.write(f"- Non-zero pixels: {np.count_nonzero(debug_img)}/{debug_img.size}")
 
         # Now predict with verification
         label, confidence = predict(image_path=processed_img_path)
