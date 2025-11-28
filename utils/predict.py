@@ -3,8 +3,6 @@ import cv2
 import tensorflow as tf
 import streamlit as st
 import os
-from huggingface_hub import hf_hub_download
-import shutil
 
 IMG_SIZE = 100
 
@@ -16,20 +14,9 @@ CLASS_MAP = {
 }
 
 @st.cache_resource
-def load_model():
-    local_model_path = "best_model.keras" 
-    
-    if not os.path.exists(local_model_path):
-        hf_model_path = hf_hub_download(
-            repo_id="Av1352/indian-sign-language-model",
-            filename="best_model.keras"
-        )
-        shutil.copy2(hf_model_path, local_model_path)
-    
-    # Load with safe_mode=False
-    model = tf.keras.models.load_model(local_model_path, compile=False, safe_mode=False)
+def load_model(model_path="Models/best_model.keras"):
+    model = tf.keras.models.load_model(model_path, compile=False)
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-    
     return model
 
 @st.cache_data
@@ -43,19 +30,10 @@ def preprocess_image(path):
     img = np.expand_dims(img, axis=0)
     return img
 
-def predict(image_path):
-    model = load_model()
+def predict(image_path="utils/processed.png", model_path="Models/best_model.keras"):
+    model = load_model(model_path)
     img = preprocess_image(image_path)
-    
-    # Use training=False to disable augmentation
     pred = model(img, training=False).numpy()
-    
-    st.write("**Top 5 Predictions:**")
-    top_5_idx = np.argsort(pred[0])[-5:][::-1]
-    for idx in top_5_idx:
-        st.write(f"✓ {CLASS_MAP[idx]}: {pred[0][idx]*100:.2f}%")
-    
     class_idx = int(np.argmax(pred))
     confidence = float(np.max(pred)) * 100
-    
     return CLASS_MAP[class_idx], confidence
