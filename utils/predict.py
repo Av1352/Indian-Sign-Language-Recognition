@@ -4,7 +4,7 @@ import tensorflow as tf
 import streamlit as st
 import os
 from huggingface_hub import hf_hub_download
-import zipfile
+import shutil
 
 IMG_SIZE = 100
 
@@ -19,53 +19,41 @@ CLASS_MAP = {
 
 @st.cache_resource
 def load_model():
+    local_model_path = "local_best_model.keras"
+    
     try:
         # Download from Hugging Face
-        model_path = hf_hub_download(
+        hf_model_path = hf_hub_download(
             repo_id="Av1352/indian-sign-language-model",
             filename="best_model.keras"
         )
         
-        # Debug: Check if file is valid
-        st.write(f"Model downloaded to: {model_path}")
-        st.write(f"File size: {os.path.getsize(model_path)} bytes")
-        
-        # Verify it's a valid zip file
-        if zipfile.is_zipfile(model_path):
-            st.write("✅ Valid .keras file format")
-        else:
-            st.error("❌ File is not a valid .keras (zip) file")
-            # Try to show first few bytes
-            with open(model_path, 'rb') as f:
-                first_bytes = f.read(100)
-                st.write(f"First bytes: {first_bytes[:50]}")
+        # Copy to a local path with proper permissions
+        shutil.copy2(hf_model_path, local_model_path)
+        st.success(f"Model copied successfully ({os.path.getsize(local_model_path)} bytes)")
         
     except Exception as e:
         st.error(f"Failed to download from Hugging Face: {e}")
         raise
     
+    # Now try loading from the local copy
     try:
-        # Try with custom objects
         import tensorflow_addons as tfa
         custom_objects = {'AdamW': tfa.optimizers.AdamW, 'Addons>AdamW': tfa.optimizers.AdamW}
-        model = tf.keras.models.load_model(model_path, custom_objects=custom_objects)
-        st.success("Model loaded with TensorFlow Addons")
+        model = tf.keras.models.load_model(local_model_path, custom_objects=custom_objects)
+        st.success("✅ Model loaded successfully!")
         return model
     except ImportError:
-        st.warning("TensorFlow Addons not available, using Adam optimizer")
-        model = tf.keras.models.load_model(model_path, compile=False)
+        st.warning("Loading without TensorFlow Addons...")
+        model = tf.keras.models.load_model(local_model_path, compile=False)
         model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
         return model
     except Exception as e:
-        st.error(f"Error loading model: {e}")
-        # Last resort
-        try:
-            model = tf.keras.models.load_model(model_path, compile=False)
-            model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-            return model
-        except Exception as e2:
-            st.error(f"Final attempt failed: {e2}")
-            raise
+        st.error(f"Loading error: {str(e)}")
+        # Try one more time with compile=False
+        model = tf.keras.models.load_model(local_model_path, compile=False)
+        model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+        return model
 
 @st.cache_data
 def preprocess_image(path="utils/processed.png"):
