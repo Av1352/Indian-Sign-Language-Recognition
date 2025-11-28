@@ -82,7 +82,6 @@ with st.sidebar.expander("Model Details", expanded=True):
 """)
 
 # --- Classification Report (as a dataframe) ---
-
 report_data = {
     "Class": [
         '0','1','2','3','4','5','6','7','8','9',
@@ -166,22 +165,43 @@ if input_image_path:
     roi_img_path = os.path.join(utils_dir, "roi.png")
     processed_img_path = os.path.join(utils_dir, "processed.png")
     gradcam_img_path = os.path.join(utils_dir, "gradcam.png")
+    
+    try:
+        # Process the image and get the actual saved paths
+        saved_roi_path = pre.roi_hand(input_img_path=input_image_path, output_img_path=roi_img_path)
+        
+        # Verify ROI was saved
+        if not os.path.exists(roi_img_path):
+            st.error("Failed to detect hand region. Please try a clearer image.")
+            st.stop()
+            
+        st.subheader("Region of Interest (ROI)")
+        st.image(roi_img_path, caption="Detected Hand Region", width=400)
 
-    pre.roi_hand(input_img_path=input_image_path, output_img_path=roi_img_path)
-    pre.preprocess_images(input_img_path=roi_img_path, output_img_path=processed_img_path)
+        saved_processed_path = pre.preprocess_images(input_img_path=roi_img_path, output_img_path=processed_img_path)
+        
+        # Verify processed image was saved
+        if not os.path.exists(processed_img_path):
+            st.error("Failed to preprocess image.")
+            st.stop()
+            
+        st.subheader("Preprocessed Image")
+        st.image(processed_img_path, caption="Model Input", width=400)
 
-    st.subheader("Region of Interest (ROI)")
-    st.image(roi_img_path, caption="Detected Hand Region", width=400)
+        if os.path.exists(gradcam_img_path):
+            st.subheader("Grad-CAM Visualization")
+            st.image(gradcam_img_path, caption="Model Focus", width=400)
 
-    st.subheader("Preprocessed Image")
-    st.image(processed_img_path, caption="Model Input", width=400)
-
-    if os.path.exists(gradcam_img_path):
-        st.subheader("Grad-CAM Visualization")
-        st.image(gradcam_img_path, caption="Model Focus", width=400)
-
-    label, confidence = predict(image_path=processed_img_path)
-    st.success(f"Predicted Sign: **{label}** (Confidence: {confidence:.2f})")
+        # Now predict with verification
+        label, confidence = predict(image_path=processed_img_path)
+        st.success(f"Predicted Sign: **{label}** (Confidence: {confidence:.2f})")
+        
+    except ValueError as e:
+        st.error(f"Detection error: {str(e)}")
+    except FileNotFoundError as e:
+        st.error(f"File error: {str(e)}")
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
 else:
     st.info("Please upload an image or take a picture to continue.")
 
