@@ -4,6 +4,7 @@ import tensorflow as tf
 import streamlit as st
 import os
 from huggingface_hub import hf_hub_download
+import zipfile
 
 IMG_SIZE = 100
 
@@ -24,24 +25,47 @@ def load_model():
             repo_id="Av1352/indian-sign-language-model",
             filename="best_model.keras"
         )
-        st.success(f"Model loaded from Hugging Face")
+        
+        # Debug: Check if file is valid
+        st.write(f"Model downloaded to: {model_path}")
+        st.write(f"File size: {os.path.getsize(model_path)} bytes")
+        
+        # Verify it's a valid zip file
+        if zipfile.is_zipfile(model_path):
+            st.write("✅ Valid .keras file format")
+        else:
+            st.error("❌ File is not a valid .keras (zip) file")
+            # Try to show first few bytes
+            with open(model_path, 'rb') as f:
+                first_bytes = f.read(100)
+                st.write(f"First bytes: {first_bytes[:50]}")
+        
     except Exception as e:
         st.error(f"Failed to download from Hugging Face: {e}")
         raise
     
     try:
+        # Try with custom objects
         import tensorflow_addons as tfa
         custom_objects = {'AdamW': tfa.optimizers.AdamW, 'Addons>AdamW': tfa.optimizers.AdamW}
         model = tf.keras.models.load_model(model_path, custom_objects=custom_objects)
+        st.success("Model loaded with TensorFlow Addons")
         return model
     except ImportError:
+        st.warning("TensorFlow Addons not available, using Adam optimizer")
         model = tf.keras.models.load_model(model_path, compile=False)
         model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
         return model
-    except Exception:
-        model = tf.keras.models.load_model(model_path, compile=False)
-        model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-        return model
+    except Exception as e:
+        st.error(f"Error loading model: {e}")
+        # Last resort
+        try:
+            model = tf.keras.models.load_model(model_path, compile=False)
+            model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+            return model
+        except Exception as e2:
+            st.error(f"Final attempt failed: {e2}")
+            raise
 
 @st.cache_data
 def preprocess_image(path="utils/processed.png"):
