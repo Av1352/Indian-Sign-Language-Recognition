@@ -48,7 +48,7 @@ class Preprocess:
         if not os.path.exists(input_img_path):
             raise FileNotFoundError(f"{input_img_path} not found.")
         
-        # MATCH YOUR TRAINING: just grayscale and resize
+        # MATCH TRAINING: grayscale + resize only
         img = cv2.imread(input_img_path, cv2.IMREAD_GRAYSCALE)
         if img is None:
             raise FileNotFoundError(f"Could not read {input_img_path}.")
