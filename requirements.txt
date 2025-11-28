@@ -2,6 +2,7 @@ streamlit==1.51.0
 tensorflow-cpu==2.15.0
 mediapipe==0.10.21
 numpy==1.26.4
+<<<<<<< Updated upstream
 protobuf==4.25.3
 
 # FORCE only headless OpenCV
@@ -17,3 +18,8 @@ matplotlib
 pandas
 imageio
 seaborn
+=======
+opencv-python-headless==4.10.0.84
+pillow
+imageio
+>>>>>>> Stashed changes
