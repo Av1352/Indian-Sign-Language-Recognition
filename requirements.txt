@@ -2,24 +2,6 @@ streamlit==1.51.0
 tensorflow-cpu==2.15.0
 mediapipe==0.10.21
 numpy==1.26.4
-<<<<<<< Updated upstream
-protobuf==4.25.3
-
-# FORCE only headless OpenCV
-opencv-python-headless==4.10.0.84
-
-# Prevent pip from installing GUI opencv via mediapipe
-opencv-python==0.0.0
-opencv-contrib-python==0.0.0
-
-Pillow
-scikit-learn
-matplotlib
-pandas
-imageio
-seaborn
-=======
 opencv-python-headless==4.10.0.84
 pillow
 imageio
->>>>>>> Stashed changes
