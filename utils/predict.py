@@ -14,8 +14,29 @@ CLASS_MAP = {
 }
 
 @st.cache_resource
-def load_model(model_path="Models/best_model.keras"):
+def load_model(model_path="Models/best_model_inference.keras"):
+    # DEBUG INFO
+    abs_path = os.path.abspath(model_path)
+    file_size = os.path.getsize(abs_path) / (1024 * 1024)
+    
+    st.write(f"🔍 Loading model from: {abs_path}")
+    st.write(f"📊 File size: {file_size:.2f} MB")
+    st.write(f"✅ File exists: {os.path.exists(abs_path)}")
+    
     model = tf.keras.models.load_model(model_path, compile=False)
+    
+    # CHECK MODEL LAYERS
+    st.write(f"📋 Model has {len(model.layers)} layers")
+    st.write(f"🔹 First layer: {model.layers[0].name}")
+    st.write(f"🔹 Second layer: {model.layers[1].name}")
+    
+    # Should NOT have data_augmentation
+    has_augmentation = any('augmentation' in layer.name for layer in model.layers)
+    if has_augmentation:
+        st.error("⚠️ MODEL STILL HAS AUGMENTATION LAYER!")
+    else:
+        st.success("✅ No augmentation layer found")
+    
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     return model
 
@@ -24,16 +45,17 @@ def preprocess_image(path):
     img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
     if img is None:
         raise FileNotFoundError(f"Could not read image at {path}")
+    
     img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
     img = img.astype("float32") / 255.0
     img = np.expand_dims(img, axis=-1)
     img = np.expand_dims(img, axis=0)
     return img
 
-def predict(image_path="utils/processed.png", model_path="Models/best_model.keras"):
-    model = load_model(model_path)
+def predict(image_path):
+    model = load_model()
     img = preprocess_image(image_path)
-    pred = model(img, training=False).numpy()
+    pred = model.predict(img, verbose=0)
     class_idx = int(np.argmax(pred))
     confidence = float(np.max(pred)) * 100
     return CLASS_MAP[class_idx], confidence
