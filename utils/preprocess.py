@@ -92,6 +92,8 @@ class Preprocess:
         
         # Get edges by Canny edge detection
         canny = cv2.Canny(hand, 60, 60)
+        kernel = np.ones((2, 2), np.uint8)
+        canny = cv2.dilate(canny, kernel, iterations=1)
         
         # NOW resize to 100x100 (after all processing)
         canny = cv2.resize(canny, (100, 100))
