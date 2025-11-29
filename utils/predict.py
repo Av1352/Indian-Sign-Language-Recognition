@@ -34,14 +34,8 @@ def load_model(model_path="Models/best_model.keras"):
 @st.cache_data
 def preprocess_image(path):
     """
-    Preprocess image to match training:
-    - Grayscale (already done by MediaPipe output)
-    - Resize to 100x100
-    - Normalize to [0,1]
-    - Add channel and batch dimensions
-    
-    NOTE: Data augmentation and normalization are built into the model,
-    so we only need to resize here.
+    Preprocess image for model input.
+    NOTE: Model has Rescaling(1./255) layer, so we DON'T normalize here!
     """
     img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
     if img is None:
@@ -50,8 +44,9 @@ def preprocess_image(path):
     # Resize to match training input
     img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
     
-    # Normalize to [0, 1] - CRITICAL: matches training
-    img = img.astype("float32") / 255.0
+    # DON'T normalize - model does it!
+    # Just convert to float32 and keep [0-255] range
+    img = img.astype("float32")  # Remove the /255.0
     
     # Add channel dimension: (100, 100) -> (100, 100, 1)
     img = np.expand_dims(img, axis=-1)
@@ -62,12 +57,11 @@ def preprocess_image(path):
     return img
 
 def predict(image_path):
-    """Predict sign language gesture"""
     model = load_model()
     img = preprocess_image(image_path)
     
-    # Model has data augmentation built-in, but we use training=False for inference
-    pred = model(img, training=False).numpy()
+    # Make SURE training=False
+    pred = model.predict(img, verbose=0)  # Use predict instead of model()
     
     class_idx = int(np.argmax(pred))
     confidence = float(np.max(pred)) * 100
