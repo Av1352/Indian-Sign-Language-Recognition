@@ -9,6 +9,7 @@ import pandas as pd
 import base64
 import cv2
 import numpy as np
+import gc
 import matplotlib.pyplot as plt
 
 # Utility function for base64 encoding
@@ -197,26 +198,19 @@ if input_image_path:
             
         st.subheader("Preprocessed Image")
         st.image(processed_img_path, caption="Model Input", width=400)
-        
-        st.subheader("🔬 Debug: What the model sees")
-
-        # Read the processed image
-        debug_img = cv2.imread(processed_img_path, cv2.IMREAD_GRAYSCALE)
-        st.write(f"Image shape: {debug_img.shape}")
-        st.write(f"Pixel range: {debug_img.min()} to {debug_img.max()}")
-        st.write(f"Mean pixel value: {debug_img.mean():.1f}")
-        st.write(f"Non-zero pixels: {np.count_nonzero(debug_img)}/{debug_img.size}")
-
-        # Show a histogram
-        import matplotlib.pyplot as plt
-        fig, ax = plt.subplots()
-        ax.hist(debug_img.flatten(), bins=50)
-        ax.set_title("Pixel Distribution")
-        st.pyplot(fig)
 
         # Predict
         label, confidence = predict(image_path=processed_img_path)
         st.success(f"Predicted Sign: **{label}** (Confidence: {confidence:.2f}%)")
+        
+        try:
+            os.remove(input_image_path)
+            os.remove(roi_img_path)
+            os.remove(processed_img_path)
+        except:
+            pass
+        
+        gc.collect()
         
     except ValueError as e:
         st.error(f"Detection error: {str(e)}")
