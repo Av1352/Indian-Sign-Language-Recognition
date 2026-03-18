@@ -6,8 +6,9 @@ import numpy as np
 
 class Preprocess:
     def __init__(self):
-        self.mphands = mp.solutions.hands
-        self.hands = self.mphands.Hands()
+        # self.mphands = mp.solutions.hands
+        # self.hands = self.mphands.Hands()
+        pass
 
     # def roi_hand(self, input_img_path, output_img_path):
     #     """
@@ -62,16 +63,16 @@ class Preprocess:
             raise FileNotFoundError(f"Cannot read {input_img_path}")
 
         h, w, _ = img.shape
-        # Simple central crop as a fallback
-        margin = int(min(h, w) * 0.1)
-        y_min, y_max = margin, h - margin
-        x_min, x_max = margin, w - margin
+        m = int(min(h, w) * 0.1)
+        y_min, y_max = m, h - m
+        x_min, x_max = m, w - m
         roi = img[y_min:y_max, x_min:x_max]
 
         os.makedirs(os.path.dirname(output_img_path), exist_ok=True)
         if not cv2.imwrite(output_img_path, roi):
             raise RuntimeError(f"Failed to save ROI to {output_img_path}")
         return output_img_path
+
 
 
     def preprocess_images(self, input_img_path, output_img_path):
