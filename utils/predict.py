@@ -65,5 +65,6 @@ def predict(image_path):
     
     class_idx = int(np.argmax(pred))
     confidence = float(np.max(pred)) * 100
-    
+    if class_idx >= len(CLASS_MAP):
+        return "Unknown", 0.0
     return CLASS_MAP[class_idx], confidence
