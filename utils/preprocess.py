@@ -63,17 +63,30 @@ class Preprocess:
             raise FileNotFoundError(f"Cannot read {input_img_path}")
 
         h, w, _ = img.shape
-        m = int(min(h, w) * 0.1)
-        y_min, y_max = m, h - m
-        x_min, x_max = m, w - m
-        roi = img[y_min:y_max, x_min:x_max]
 
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        lower = np.array([0, 40, 30], np.uint8)
+        upper = np.array([43, 255, 255], np.uint8)
+        mask = cv2.inRange(hsv, lower, upper)
+
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if not contours:
+            raise ValueError("No hand region found for ROI.")
+
+        cnt = max(contours, key=cv2.contourArea)
+        x, y, w_box, h_box = cv2.boundingRect(cnt)
+
+        padding = 20
+        x_min = max(0, x - padding)
+        y_min = max(0, y - padding)
+        x_max = min(img.shape[1], x + w_box + padding)
+        y_max = min(img.shape[0], y + h_box + padding)
+
+        roi = img[y_min:y_max, x_min:x_max]
         os.makedirs(os.path.dirname(output_img_path), exist_ok=True)
         if not cv2.imwrite(output_img_path, roi):
             raise RuntimeError(f"Failed to save ROI to {output_img_path}")
         return output_img_path
-
-
 
     def preprocess_images(self, input_img_path, output_img_path):
         """Match training: do all processing FIRST, then resize at the end if needed"""
