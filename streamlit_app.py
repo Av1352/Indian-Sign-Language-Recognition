@@ -126,11 +126,11 @@ tab_pred, tab_conf = st.sidebar.tabs(["Predictions", "Confusion Matrix"])
 
 with tab_pred:
     if os.path.exists("files/output.png"):
-        st.image("files/output.png", caption="Model Predictions", use_container_width=True)
+        st.image("files/output.png", caption="Model Predictions", width='stretch')
 
 with tab_conf:
     if os.path.exists("files/conf_matrix.png"):
-        st.image("files/conf_matrix.png", caption="Confusion Matrix", use_container_width=True)
+        st.image("files/conf_matrix.png", caption="Confusion Matrix", width='stretch')
 
 # Main content
 st.image("assets/logo.png", width=100)
