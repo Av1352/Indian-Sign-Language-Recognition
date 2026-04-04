@@ -155,9 +155,13 @@ class Preprocess:
         gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         hsv_img  = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-        skin_color_lower = np.array([0,  40,  30], np.uint8)
-        skin_color_upper = np.array([43, 255, 255], np.uint8)
-        skin_mask = cv2.inRange(hsv_img, skin_color_lower, skin_color_upper)
+        # Primary range: covers light-to-medium skin tones
+        skin_mask  = cv2.inRange(hsv_img, np.array([0,  20,  70], np.uint8),
+                                          np.array([20, 255, 255], np.uint8))
+        # Secondary range: covers darker/deeper skin tones (hue wraps near 180)
+        skin_mask2 = cv2.inRange(hsv_img, np.array([160, 20,  70], np.uint8),
+                                          np.array([180, 255, 255], np.uint8))
+        skin_mask  = cv2.bitwise_or(skin_mask, skin_mask2)
 
         skin_mask = cv2.medianBlur(skin_mask, 5)
         skin_mask = cv2.addWeighted(skin_mask, 0.5, skin_mask, 0.5, 0.0)
