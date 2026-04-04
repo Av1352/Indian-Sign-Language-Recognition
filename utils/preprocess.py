@@ -143,19 +143,40 @@ class Preprocess:
         if not os.path.exists(input_img_path):
             raise FileNotFoundError(f"{input_img_path} not found.")
 
-        img = cv2.imread(input_img_path, cv2.IMREAD_GRAYSCALE)
+        # Read as BGR (cv2 default) — equivalent to training's imageio RGB read
+        # when paired with COLOR_BGR2GRAY / COLOR_BGR2HSV below
+        img = cv2.imread(input_img_path)
         if img is None:
             raise FileNotFoundError(f"Could not read {input_img_path}.")
 
         print(f"[DEBUG preprocess] ROI shape: {img.shape}, min={img.min()}, max={img.max()}")
-        img = cv2.resize(img, (100, 100))
-        print(f"[DEBUG preprocess] After resize: shape={img.shape}, min={img.min()}, max={img.max()}")
 
-        # Save as uint8 grayscale — NO normalisation here;
-        # model has internal Rescaling(1./255), so predict.py passes raw [0-255] values.
+        # Replicate training pipeline exactly (preprocessing.ipynb cell 4)
+        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        hsv_img  = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+        skin_color_lower = np.array([0,  40,  30], np.uint8)
+        skin_color_upper = np.array([43, 255, 255], np.uint8)
+        skin_mask = cv2.inRange(hsv_img, skin_color_lower, skin_color_upper)
+
+        skin_mask = cv2.medianBlur(skin_mask, 5)
+        skin_mask = cv2.addWeighted(skin_mask, 0.5, skin_mask, 0.5, 0.0)
+
+        kernel    = np.ones((5, 5), np.uint8)
+        skin_mask = cv2.morphologyEx(skin_mask, cv2.MORPH_CLOSE, kernel)
+
+        hand  = cv2.bitwise_and(gray_img, gray_img, mask=skin_mask)
+        canny = cv2.Canny(hand, 60, 60)
+
+        # Resize AFTER Canny — matches how image_dataset_from_directory
+        # resized the training Canny images to (100, 100) during model training
+        canny = cv2.resize(canny, (100, 100))
+
+        print(f"[DEBUG preprocess] After Canny+resize: shape={canny.shape}, min={canny.min()}, max={canny.max()}")
+
         out_dir = os.path.dirname(output_img_path)
         if out_dir:
             os.makedirs(out_dir, exist_ok=True)
-        if not cv2.imwrite(output_img_path, img):
+        if not cv2.imwrite(output_img_path, canny):
             raise RuntimeError(f"Failed to save preprocessed image to {output_img_path}")
         return output_img_path
