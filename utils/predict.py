@@ -40,29 +40,22 @@ def preprocess_image(path):
     img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
     if img is None:
         raise FileNotFoundError(f"Could not read image at {path}")
-    
-    # Resize to match training input
+
+    print(f"[DEBUG predict] Loaded shape: {img.shape}, min={img.min()}, max={img.max()}")
     img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
-    
-    # DON'T normalize - model does it!
-    # Just convert to float32 and keep [0-255] range
-    img = img.astype("float32")  # Remove the /255.0
-    
-    # Add channel dimension: (100, 100) -> (100, 100, 1)
+    # Keep [0-255] range — model's internal Rescaling(1./255) handles normalisation
+    img = img.astype("float32")
+    print(f"[DEBUG predict] Tensor: shape={img.shape}, min={img.min():.3f}, max={img.max():.3f}")
     img = np.expand_dims(img, axis=-1)
-    
-    # Add batch dimension: (100, 100, 1) -> (1, 100, 100, 1)
     img = np.expand_dims(img, axis=0)
-    
     return img
 
 def predict(image_path):
     model = load_model()
     img = preprocess_image(image_path)
-    
-    # Make SURE training=False
-    pred = model.predict(img, verbose=0)  # Use predict instead of model()
-    
+    pred = model.predict(img, verbose=0)
+    top5_idx = np.argsort(pred[0])[::-1][:5]
+    print(f"[DEBUG predict] Top-5: {[(CLASS_MAP[i], f'{pred[0][i]*100:.2f}%') for i in top5_idx]}")
     class_idx = int(np.argmax(pred))
     confidence = float(np.max(pred)) * 100
     if class_idx >= len(CLASS_MAP):

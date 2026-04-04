@@ -88,53 +88,74 @@ class Preprocess:
             raise RuntimeError(f"Failed to save ROI to {output_img_path}")
         return output_img_path
 
+    # def preprocess_images(self, input_img_path, output_img_path):
+    #     """Match training: do all processing FIRST, then resize at the end if needed"""
+    #     if not os.path.exists(input_img_path):
+    #         raise FileNotFoundError(f"{input_img_path} not found.")
+        
+    #     # Read image (don't resize yet!)
+    #     img = cv2.imread(input_img_path)
+    #     if img is None or img.size == 0:
+    #         raise FileNotFoundError(f"Could not read {input_img_path}.")
+        
+    #     # Converting image to grayscale
+    #     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        
+    #     # Converting image to HSV format
+    #     hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        
+    #     # Defining boundary level for skin color in HSV
+    #     skin_color_lower = np.array([0, 40, 30], np.uint8)
+    #     skin_color_upper = np.array([43, 255, 255], np.uint8)
+        
+    #     # Producing mask
+    #     skin_mask = cv2.inRange(hsv_img, skin_color_lower, skin_color_upper)
+        
+    #     # Removing Noise from mask
+    #     skin_mask = cv2.medianBlur(skin_mask, 5)
+    #     skin_mask = cv2.addWeighted(skin_mask, 0.5, skin_mask, 0.5, 0.0)
+        
+    #     # Applying Morphological operations
+    #     kernel = np.ones((5, 5), np.uint8)
+    #     skin_mask = cv2.morphologyEx(skin_mask, cv2.MORPH_CLOSE, kernel)
+        
+    #     # Extracting hand by applying mask
+    #     hand = cv2.bitwise_and(gray_img, gray_img, mask=skin_mask)
+        
+    #     # Get edges by Canny edge detection
+    #     canny = cv2.Canny(hand, 60, 60)
+    #     kernel = np.ones((2, 2), np.uint8)
+    #     canny = cv2.dilate(canny, kernel, iterations=1)
+        
+    #     # NOW resize to 100x100 (after all processing)
+    #     canny = cv2.resize(canny, (100, 100))
+        
+    #     # Save
+    #     os.makedirs(os.path.dirname(output_img_path), exist_ok=True)
+    #     success = cv2.imwrite(output_img_path, canny)
+        
+    #     if success and os.path.exists(output_img_path):
+    #         return output_img_path
+    #     else:
+    #         raise RuntimeError(f"Failed to save preprocessed image")
+    
     def preprocess_images(self, input_img_path, output_img_path):
-        """Match training: do all processing FIRST, then resize at the end if needed"""
         if not os.path.exists(input_img_path):
             raise FileNotFoundError(f"{input_img_path} not found.")
-        
-        # Read image (don't resize yet!)
-        img = cv2.imread(input_img_path)
-        if img is None or img.size == 0:
+
+        img = cv2.imread(input_img_path, cv2.IMREAD_GRAYSCALE)
+        if img is None:
             raise FileNotFoundError(f"Could not read {input_img_path}.")
-        
-        # Converting image to grayscale
-        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        
-        # Converting image to HSV format
-        hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        
-        # Defining boundary level for skin color in HSV
-        skin_color_lower = np.array([0, 40, 30], np.uint8)
-        skin_color_upper = np.array([43, 255, 255], np.uint8)
-        
-        # Producing mask
-        skin_mask = cv2.inRange(hsv_img, skin_color_lower, skin_color_upper)
-        
-        # Removing Noise from mask
-        skin_mask = cv2.medianBlur(skin_mask, 5)
-        skin_mask = cv2.addWeighted(skin_mask, 0.5, skin_mask, 0.5, 0.0)
-        
-        # Applying Morphological operations
-        kernel = np.ones((5, 5), np.uint8)
-        skin_mask = cv2.morphologyEx(skin_mask, cv2.MORPH_CLOSE, kernel)
-        
-        # Extracting hand by applying mask
-        hand = cv2.bitwise_and(gray_img, gray_img, mask=skin_mask)
-        
-        # Get edges by Canny edge detection
-        canny = cv2.Canny(hand, 60, 60)
-        kernel = np.ones((2, 2), np.uint8)
-        canny = cv2.dilate(canny, kernel, iterations=1)
-        
-        # NOW resize to 100x100 (after all processing)
-        canny = cv2.resize(canny, (100, 100))
-        
-        # Save
-        os.makedirs(os.path.dirname(output_img_path), exist_ok=True)
-        success = cv2.imwrite(output_img_path, canny)
-        
-        if success and os.path.exists(output_img_path):
-            return output_img_path
-        else:
-            raise RuntimeError(f"Failed to save preprocessed image")
+
+        print(f"[DEBUG preprocess] ROI shape: {img.shape}, min={img.min()}, max={img.max()}")
+        img = cv2.resize(img, (100, 100))
+        print(f"[DEBUG preprocess] After resize: shape={img.shape}, min={img.min()}, max={img.max()}")
+
+        # Save as uint8 grayscale — NO normalisation here;
+        # model has internal Rescaling(1./255), so predict.py passes raw [0-255] values.
+        out_dir = os.path.dirname(output_img_path)
+        if out_dir:
+            os.makedirs(out_dir, exist_ok=True)
+        if not cv2.imwrite(output_img_path, img):
+            raise RuntimeError(f"Failed to save preprocessed image to {output_img_path}")
+        return output_img_path
