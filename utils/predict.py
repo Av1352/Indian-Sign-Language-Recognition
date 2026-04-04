@@ -31,7 +31,6 @@ def load_model(model_path="Models/best_model.keras"):
         )
     return model
 
-@st.cache_data
 def preprocess_image(path):
     """
     Preprocess image for model input.

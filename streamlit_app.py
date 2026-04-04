@@ -203,13 +203,6 @@ if input_image_path:
         label, confidence = predict(image_path=processed_img_path)
         st.success(f"Predicted Sign: **{label}** (Confidence: {confidence:.2f}%)")
         
-        try:
-            os.remove(input_image_path)
-            os.remove(roi_img_path)
-            os.remove(processed_img_path)
-        except:
-            pass
-        
         gc.collect()
         
     except ValueError as e:
