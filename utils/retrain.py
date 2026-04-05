@@ -46,50 +46,72 @@ WEIGHT_DECAY = 1e-4
 # ---------------------------------------------------------------------------
 
 
-def load_data_to_numpy(data_dir, img_size=(100, 100), val_split=0.2, seed=1337):
+def load_data_to_numpy(data_dir, img_size=(100, 100), seed=1337):
     """
-    Read all images from data_dir/{class}/ into numpy arrays using cv2.
-    Returns X_train, y_train, X_val, y_val (float32), class_names.
-    Images are stored as float32 [0-255] — the model's Rescaling(1./255)
-    layer handles normalisation internally.
+    Read images from data_dir/{class}/ into numpy arrays using cv2.
+
+    Split strategy:
+      - Training:   augmented images only  (stem starts with "aug_")
+      - Validation: original images only   (stem does NOT start with "aug_")
+
+    This gives a clean real-world accuracy signal during training because
+    the validation set never contains synthetic variants.
+
+    Images stored as float32 [0-255]; model's Rescaling(1./255) normalises.
     """
     class_dirs  = sorted(d for d in Path(data_dir).iterdir() if d.is_dir())
     class_names = [d.name for d in class_dirs]
     n_classes   = len(class_names)
 
-    X_list, y_list = [], []
+    X_train_list, y_train_list = [], []
+    X_val_list,   y_val_list   = [], []
+
     for class_idx, class_dir in enumerate(class_dirs):
-        image_files = sorted(
+        all_files = sorted(
             f for f in class_dir.iterdir()
             if f.suffix.lower() in {".jpg", ".png"}
         )
-        print(f"  Loading [{class_dir.name}] — {len(image_files)} images …")
-        for img_path in image_files:
+        aug_files  = [f for f in all_files if     f.stem.startswith("aug_")]
+        orig_files = [f for f in all_files if not f.stem.startswith("aug_")]
+
+        print(
+            f"  [{class_dir.name}] originals: {len(orig_files)}  "
+            f"augmented: {len(aug_files)}"
+        )
+
+        for img_path in aug_files:
             img = cv2.imread(str(img_path), cv2.IMREAD_GRAYSCALE)
             if img is None:
                 continue
             if img.shape != img_size:
                 img = cv2.resize(img, img_size, interpolation=cv2.INTER_LINEAR)
-            X_list.append(img)
-            y_list.append(class_idx)
+            X_train_list.append(img)
+            y_train_list.append(class_idx)
 
-    # Stack into arrays: (N, H, W, 1) float32
-    X = np.array(X_list, dtype=np.float32)[..., np.newaxis]
-    y = tf.keras.utils.to_categorical(y_list, num_classes=n_classes).astype(np.float32)
+        for img_path in orig_files:
+            img = cv2.imread(str(img_path), cv2.IMREAD_GRAYSCALE)
+            if img is None:
+                continue
+            if img.shape != img_size:
+                img = cv2.resize(img, img_size, interpolation=cv2.INTER_LINEAR)
+            X_val_list.append(img)
+            y_val_list.append(class_idx)
 
-    print(f"\n  Total images: {len(X)}  |  shape: {X.shape}")
-    print(f"  RAM for X: {X.nbytes / 1e9:.2f} GB")
+    def to_arrays(X_list, y_list):
+        X = np.array(X_list, dtype=np.float32)[..., np.newaxis]
+        y = tf.keras.utils.to_categorical(y_list, num_classes=n_classes).astype(np.float32)
+        return X, y
 
-    # Shuffle then split (reproducible)
+    X_train, y_train = to_arrays(X_train_list, y_train_list)
+    X_val,   y_val   = to_arrays(X_val_list,   y_val_list)
+
+    # Shuffle training set
     rng = np.random.default_rng(seed)
-    idx = rng.permutation(len(X))
-    X, y = X[idx], y[idx]
+    idx = rng.permutation(len(X_train))
+    X_train, y_train = X_train[idx], y_train[idx]
 
-    split      = int(len(X) * (1 - val_split))
-    X_train, y_train = X[:split], y[:split]
-    X_val,   y_val   = X[split:], y[split:]
-
-    print(f"  Train: {len(X_train)}  |  Val: {len(X_val)}")
+    print(f"\n  Train (aug only): {len(X_train)}  |  RAM: {X_train.nbytes / 1e9:.2f} GB")
+    print(f"  Val  (orig only): {len(X_val)}   |  RAM: {X_val.nbytes / 1e9:.2f} GB")
     return X_train, y_train, X_val, y_val, class_names
 
 
@@ -169,6 +191,7 @@ def main() -> None:
     train_ds = (
         train_ds
         .shuffle(10000, seed=SEED, reshuffle_each_iteration=True)
+        .repeat()
         .batch(BATCH_SIZE)
         .prefetch(AUTOTUNE)
     )
