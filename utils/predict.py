@@ -14,7 +14,7 @@ CLASS_MAP = {
 }
 
 @st.cache_resource
-def load_model(model_path="Models/best_model.keras"):
+def load_model(model_path="NEW_Models/best_model_inference.keras"):
     """Load model with AdamW optimizer handling"""
     try:
         # Try loading with TensorFlow Addons
