@@ -139,43 +139,15 @@ class Preprocess:
     #         raise RuntimeError(f"Failed to save preprocessed image")
     
     def preprocess_images(self, input_img_path, output_img_path):
-        if not os.path.exists(input_img_path):
-            raise FileNotFoundError(f"{input_img_path} not found.")
-
-        # Read as BGR (cv2 default) — equivalent to training's imageio RGB read
-        # when paired with COLOR_BGR2GRAY / COLOR_BGR2HSV below
         img = cv2.imread(input_img_path)
         if img is None:
             raise FileNotFoundError(f"Could not read {input_img_path}.")
 
-        print(f"[DEBUG preprocess] ROI shape: {img.shape}, min={img.min()}, max={img.max()}")
-
-        # Replicate training pipeline exactly (preprocessing.ipynb cell 4)
-        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        hsv_img  = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
-        # Primary range: covers light-to-medium skin tones
-        skin_mask  = cv2.inRange(hsv_img, np.array([0,  20,  70], np.uint8),
-                                          np.array([20, 255, 255], np.uint8))
-        # Secondary range: covers darker/deeper skin tones (hue wraps near 180)
-        skin_mask2 = cv2.inRange(hsv_img, np.array([160, 20,  70], np.uint8),
-                                          np.array([180, 255, 255], np.uint8))
-        skin_mask  = cv2.bitwise_or(skin_mask, skin_mask2)
-
-        skin_mask = cv2.medianBlur(skin_mask, 5)
-        skin_mask = cv2.addWeighted(skin_mask, 0.5, skin_mask, 0.5, 0.0)
-
-        kernel    = np.ones((5, 5), np.uint8)
-        skin_mask = cv2.morphologyEx(skin_mask, cv2.MORPH_CLOSE, kernel)
-
-        hand  = cv2.bitwise_and(gray_img, gray_img, mask=skin_mask)
-        canny = cv2.Canny(hand, 60, 60)
-
-        # Resize AFTER Canny — matches how image_dataset_from_directory
-        # resized the training Canny images to (100, 100) during model training
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        canny = cv2.Canny(gray, 60, 60)
+        kernel = np.ones((2, 2), np.uint8)
+        canny = cv2.dilate(canny, kernel, iterations=1)
         canny = cv2.resize(canny, (100, 100))
-
-        print(f"[DEBUG preprocess] After Canny+resize: shape={canny.shape}, min={canny.min()}, max={canny.max()}")
 
         out_dir = os.path.dirname(output_img_path)
         if out_dir:
@@ -183,3 +155,49 @@ class Preprocess:
         if not cv2.imwrite(output_img_path, canny):
             raise RuntimeError(f"Failed to save preprocessed image to {output_img_path}")
         return output_img_path
+    
+    # def preprocess_images(self, input_img_path, output_img_path):
+    #     if not os.path.exists(input_img_path):
+    #         raise FileNotFoundError(f"{input_img_path} not found.")
+
+    #     # Read as BGR (cv2 default) — equivalent to training's imageio RGB read
+    #     # when paired with COLOR_BGR2GRAY / COLOR_BGR2HSV below
+    #     img = cv2.imread(input_img_path)
+    #     if img is None:
+    #         raise FileNotFoundError(f"Could not read {input_img_path}.")
+
+    #     print(f"[DEBUG preprocess] ROI shape: {img.shape}, min={img.min()}, max={img.max()}")
+
+    #     # Replicate training pipeline exactly (preprocessing.ipynb cell 4)
+    #     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    #     hsv_img  = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+    #     # Primary range: covers light-to-medium skin tones
+    #     skin_mask  = cv2.inRange(hsv_img, np.array([0,  20,  70], np.uint8),
+    #                                       np.array([20, 255, 255], np.uint8))
+    #     # Secondary range: covers darker/deeper skin tones (hue wraps near 180)
+    #     skin_mask2 = cv2.inRange(hsv_img, np.array([160, 20,  70], np.uint8),
+    #                                       np.array([180, 255, 255], np.uint8))
+    #     skin_mask  = cv2.bitwise_or(skin_mask, skin_mask2)
+
+    #     skin_mask = cv2.medianBlur(skin_mask, 5)
+    #     skin_mask = cv2.addWeighted(skin_mask, 0.5, skin_mask, 0.5, 0.0)
+
+    #     kernel    = np.ones((5, 5), np.uint8)
+    #     skin_mask = cv2.morphologyEx(skin_mask, cv2.MORPH_CLOSE, kernel)
+
+    #     hand  = cv2.bitwise_and(gray_img, gray_img, mask=skin_mask)
+    #     canny = cv2.Canny(hand, 60, 60)
+
+    #     # Resize AFTER Canny — matches how image_dataset_from_directory
+    #     # resized the training Canny images to (100, 100) during model training
+    #     canny = cv2.resize(canny, (100, 100))
+
+    #     print(f"[DEBUG preprocess] After Canny+resize: shape={canny.shape}, min={canny.min()}, max={canny.max()}")
+
+    #     out_dir = os.path.dirname(output_img_path)
+    #     if out_dir:
+    #         os.makedirs(out_dir, exist_ok=True)
+    #     if not cv2.imwrite(output_img_path, canny):
+    #         raise RuntimeError(f"Failed to save preprocessed image to {output_img_path}")
+    #     return output_img_path
