@@ -47,7 +47,7 @@ class Preprocess:
         gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         
-        skin_color_lower = np.array([0, 40, 30], np.uint8)
+        skin_color_lower = np.array([0, 15, 20], np.uint8)
         skin_color_upper = np.array([43, 255, 255], np.uint8)
         skin_mask = cv2.inRange(hsv_img, skin_color_lower, skin_color_upper)
         skin_mask = cv2.medianBlur(skin_mask, 5)
