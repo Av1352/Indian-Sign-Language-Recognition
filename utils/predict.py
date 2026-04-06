@@ -1,62 +1,63 @@
-import numpy as np
 import cv2
-import tensorflow as tf
+import joblib
+import numpy as np
+import mediapipe as mp
 import streamlit as st
 
-IMG_SIZE = 100
+LANDMARK_MODEL_PATH = "NEW_Models/landmark_model.pkl"
 
-# Alphabetically sorted - matches image_dataset_from_directory
-CLASS_MAP = {
-    0: '0', 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9',
-    10: 'a', 11: 'b', 12: 'c', 13: 'd', 14: 'e', 15: 'f', 16: 'g', 17: 'h', 18: 'i', 19: 'j',
-    20: 'k', 21: 'l', 22: 'm', 23: 'n', 24: 'o', 25: 'p', 26: 'q', 27: 'r', 28: 's', 29: 't',
-    30: 'u', 31: 'v', 32: 'w', 33: 'x', 34: 'y', 35: 'z'
-}
 
 @st.cache_resource
-def load_model(model_path="NEW_Models/best_model_inference.keras"):
-    """Load model with AdamW optimizer handling"""
-    try:
-        # Try loading with TensorFlow Addons
-        import tensorflow_addons as tfa
-        custom_objects = {'AdamW': tfa.optimizers.AdamW}
-        model = tf.keras.models.load_model(model_path, custom_objects=custom_objects)
-    except:
-        # Fallback: load without optimizer and recompile
-        model = tf.keras.models.load_model(model_path, compile=False)
-        model.compile(
-            optimizer='adam',
-            loss='categorical_crossentropy',
-            metrics=['accuracy']
-        )
-    return model
+def load_landmark_model(model_path=LANDMARK_MODEL_PATH):
+    payload = joblib.load(model_path)
+    return payload["model"], payload["label_encoder"]
 
-def preprocess_image(path):
-    """
-    Preprocess image for model input.
-    NOTE: Model has Rescaling(1./255) layer, so we DON'T normalize here!
-    """
-    img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-    if img is None:
-        raise FileNotFoundError(f"Could not read image at {path}")
 
-    print(f"[DEBUG predict] Loaded shape: {img.shape}, min={img.min()}, max={img.max()}")
-    img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
-    # Keep [0-255] range — model's internal Rescaling(1./255) handles normalisation
-    img = img.astype("float32")
-    print(f"[DEBUG predict] Tensor: shape={img.shape}, min={img.min():.3f}, max={img.max():.3f}")
-    img = np.expand_dims(img, axis=-1)
-    img = np.expand_dims(img, axis=0)
-    return img
+def extract_landmarks(image_path):
+    """
+    Run MediaPipe Hands on image_path, return a (1, 42) float32 array of
+    bbox-normalised landmark coordinates — same pipeline as extract_landmarks.py.
+    Raises ValueError if no hand is detected.
+    """
+    img_bgr = cv2.imread(image_path)
+    if img_bgr is None:
+        raise FileNotFoundError(f"Could not read image at {image_path}")
+
+    img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+
+    mp_hands = mp.solutions.hands
+    with mp_hands.Hands(
+        static_image_mode        = True,
+        max_num_hands            = 1,
+        min_detection_confidence = 0.3,
+    ) as hands:
+        result = hands.process(img_rgb)
+
+    if not result.multi_hand_landmarks:
+        raise ValueError("No hand detected — please upload a clearer image.")
+
+    landmarks = [(lm.x, lm.y) for lm in result.multi_hand_landmarks[0].landmark]
+
+    xs = [p[0] for p in landmarks]
+    ys = [p[1] for p in landmarks]
+    x_min, x_max = min(xs), max(xs)
+    y_min, y_max = min(ys), max(ys)
+    x_range = x_max - x_min if x_max > x_min else 1.0
+    y_range = y_max - y_min if y_max > y_min else 1.0
+
+    features = []
+    for x, y in landmarks:
+        features.append((x - x_min) / x_range)
+        features.append((y - y_min) / y_range)
+
+    return np.array(features, dtype=np.float32).reshape(1, -1)
+
 
 def predict(image_path):
-    model = load_model()
-    img = preprocess_image(image_path)
-    pred = model.predict(img, verbose=0)
-    top5_idx = np.argsort(pred[0])[::-1][:5]
-    print(f"[DEBUG predict] Top-5: {[(CLASS_MAP[i], f'{pred[0][i]*100:.2f}%') for i in top5_idx]}")
-    class_idx = int(np.argmax(pred))
-    confidence = float(np.max(pred)) * 100
-    if class_idx >= len(CLASS_MAP):
-        return "Unknown", 0.0
-    return CLASS_MAP[class_idx], confidence
+    clf, le = load_landmark_model()
+    features = extract_landmarks(image_path)
+    proba      = clf.predict_proba(features)[0]
+    class_idx  = int(np.argmax(proba))
+    confidence = float(proba[class_idx]) * 100
+    label      = le.inverse_transform([class_idx])[0]
+    return label, confidence

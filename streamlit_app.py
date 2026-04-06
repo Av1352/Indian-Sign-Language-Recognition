@@ -3,7 +3,6 @@ import os
 import tempfile
 import uuid
 from PIL import Image
-from utils.preprocess import Preprocess
 from utils.predict import predict
 import pandas as pd
 import base64
@@ -147,9 +146,6 @@ st.header("Upload or Capture Hand Image")
 uploaded_file = st.file_uploader("Upload a hand sign image", type=["png", "jpg", "jpeg"])
 camera_img = st.camera_input("Or take a picture")
 
-# Initialize preprocessing
-pre = Preprocess()
-
 # Session-specific directory
 if 'session_id' not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
@@ -171,40 +167,12 @@ if input_image_path:
     st.subheader("Input Image")
     st.image(input_image_path, caption="Uploaded Input", width=400)
 
-    roi_img_path = os.path.join(session_dir, "roi.png")
-    processed_img_path = os.path.join(session_dir, "processed.png")
-    
-    # Clean up old files
-    for old_file in [roi_img_path, processed_img_path]:
-        if os.path.exists(old_file):
-            os.remove(old_file)
-    
     try:
-        # Process image
-        saved_roi_path = pre.roi_hand(input_img_path=input_image_path, output_img_path=roi_img_path)
-        
-        if not os.path.exists(roi_img_path):
-            st.error("Failed to detect hand region. Please try a clearer image.")
-            st.stop()
-            
-        st.subheader("Region of Interest (ROI)")
-        st.image(roi_img_path, caption="Detected Hand Region", width=400)
-
-        saved_processed_path = pre.preprocess_images(input_img_path=roi_img_path, output_img_path=processed_img_path)
-        
-        if not os.path.exists(processed_img_path):
-            st.error("Failed to preprocess image.")
-            st.stop()
-            
-        st.subheader("Preprocessed Image")
-        st.image(processed_img_path, caption="Model Input", width=400)
-
-        # Predict
-        label, confidence = predict(image_path=processed_img_path)
+        label, confidence = predict(image_path=input_image_path)
         st.success(f"Predicted Sign: **{label}** (Confidence: {confidence:.2f}%)")
-        
+
         gc.collect()
-        
+
     except ValueError as e:
         st.error(f"Detection error: {str(e)}")
     except FileNotFoundError as e:
